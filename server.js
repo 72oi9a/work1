@@ -287,15 +287,16 @@ async function ensureDatabase() {
     ["al-naaim_scout"]
   )).rows[0]?.id;
 
-  // Seed demo accounts only during the first database initialization.
-  if (userCount.rows[0].count === 0) {
+  const firstDatabaseInitialization = userCount.rows[0].count === 0;
+
+  // Seed demo data only during the first database initialization.
+  if (firstDatabaseInitialization) {
     adminId = await seedUser("al-naaim_scout", "قائد الفرقة", "قائد الفرقة", "scout2026");
     await seedUser("mohammed@scouts.bh", "محمد علي", "مشرف عام", "scout2026");
     await seedUser("salman@scouts.bh", "سلمان حسن", "قائد طليعة", "scout2026");
   }
 
-  const memberCount = await pool.query("SELECT COUNT(*)::int AS count FROM members");
-  if (memberCount.rows[0].count === 0) {
+  if (firstDatabaseInitialization) {
     await pool.query(`
       INSERT INTO members
         (full_name, scout_number, patrol, rank, join_date, phone, guardian_name, guardian_phone, email, address, notes)
@@ -306,8 +307,7 @@ async function ensureDatabase() {
     `);
   }
 
-  const reportCount = await pool.query("SELECT COUNT(*)::int AS count FROM activity_reports");
-  if (reportCount.rows[0].count === 0) {
+  if (firstDatabaseInitialization) {
     await pool.query(
       `INSERT INTO activity_reports (title, axis, activity_date, data, created_by)
        VALUES
