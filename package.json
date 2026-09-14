@@ -1,0 +1,8 @@
+{
+  "name": "al-naaim-scout-management",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 5000 --bind 0.0.0.0"
+  }
+}

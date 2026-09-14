@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>منظومة فرقة متقدم النعيم الكشفي</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+      :root {
+        --bg: #0b0b0b;
+        --panel: #161513;
+        --panel-soft: #1c1916;
+        --line: #2d2822;
+        --line-soft: #27231f;
+        --text: #f3f4f6;
+        --muted: #a1a1aa;
+        --muted-dark: #71717a;
+        --khaki: #c8ab83;
+        --khaki-dark: #9c7a4f;
+        --brown: #725032;
+        --brown-dark: #4b321f;
+        --danger: #b42318;
+        --success: #34d399;
+        --sidebar-width: 270px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 320px;
+        background: var(--bg);
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 85% -10%, rgba(114, 80, 50, 0.16), transparent 28rem),
+          var(--bg);
+        font-family: "Tajawal", system-ui, sans-serif;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app-shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        flex: 0 0 var(--sidebar-width);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 24px 18px;
+        background: rgba(0, 0, 0, 0.88);
+        border-left: 1px solid #252525;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 32px;
+        padding: 0 4px 20px;
+        border-bottom: 1px solid #272727;
+      }
+
+      .brand-mark,
+      .login-mark {
+        display: grid;
+        place-items: center;
+        color: var(--khaki);
+        background: #111;
+        border: 1px solid var(--khaki);
+        border-radius: 50%;
+        box-shadow: 0 0 0 5px rgba(200, 171, 131, 0.04);
+      }
+
+      .brand-mark {
+        width: 44px;
+        height: 44px;
+        font-size: 21px;
+      }
+
+      .brand-title {
+        margin: 0;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .brand-subtitle {
+        margin: 4px 0 0;
+        color: var(--khaki);
+        font-size: 10px;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav-button {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 13px 14px;
+        color: #a1a1aa;
+        text-align: right;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        transition:
+          color 160ms ease,
+          background 160ms ease,
+          border 160ms ease,
+          transform 160ms ease;
+      }
+
+      .nav-button:hover {
+        color: #fff;
+        background: #191919;
+        transform: translateX(-2px);
+      }
+
+      .nav-button.active {
+        color: #fff;
+        background: var(--brown);
+        border-color: rgba(200, 171, 131, 0.6);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+
+      .nav-button i {
+        width: 20px;
+        color: var(--khaki);
+        text-align: center;
+        font-size: 15px;
+      }
+
+      .user-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 24px;
+        padding: 17px 4px 0;
+        border-top: 1px solid #272727;
+      }
+
+      .user-role {
+        margin: 0;
+        color: var(--khaki);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .user-team {
+        margin: 4px 0 0;
+        color: var(--muted-dark);
+        font-size: 10px;
+      }
+
+      .logout-button {
+        width: 34px;
+        height: 34px;
+        color: #f87171;
+        background: transparent;
+        border: 0;
+        border-radius: 8px;
+      }
+
+      .logout-button:hover {
+        color: #fca5a5;
+        background: rgba(127, 29, 29, 0.2);
+      }
+
+      .main {
+        width: min(100%, 1120px);
+        margin: 0 auto;
+        padding: 42px 38px 64px;
+      }
+
+      .view {
+        display: grid;
+        gap: 24px;
+        animation: enter 220ms ease both;
+      }
+
+      .view[hidden] {
+        display: none;
+      }
+
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .page-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .eyebrow {
+        margin: 0 0 7px;
+        color: var(--khaki);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+
+      .page-title {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(24px, 3vw, 31px);
+        font-weight: 900;
+        line-height: 1.2;
+      }
+
+      .page-description {
+        margin: 8px 0 0;
+        color: #8c8c93;
+        font-size: 12px;
+      }
+
+      .primary-button,
+      .danger-button,
+      .ghost-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        padding: 0 17px;
+        color: #0b0b0b;
+        font-size: 12px;
+        font-weight: 800;
+        border: 1px solid transparent;
+        border-radius: 11px;
+        transition:
+          background 160ms ease,
+          border 160ms ease,
+          transform 160ms ease;
+      }
+
+      .primary-button {
+        background: var(--khaki);
+      }
+
+      .primary-button:hover {
+        background: #e0c294;
+        transform: translateY(-1px);
+      }
+
+      .danger-button {
+        color: #fff;
+        background: var(--danger);
+      }
+
+      .danger-button:hover {
+        background: #d12b1e;
+        transform: translateY(-1px);
+      }
+
+      .ghost-button {
+        min-height: 36px;
+        color: var(--khaki);
+        background: transparent;
+        border-color: #504333;
+      }
+
+      .ghost-button:hover {
+        color: #fff;
+        background: #211b16;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        background: linear-gradient(145deg, rgba(28, 25, 22, 0.95), rgba(20, 19, 17, 0.98));
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card {
+        min-height: 125px;
+        padding: 19px;
+      }
+
+      .stat-label {
+        margin: 0 0 11px;
+        color: #94949b;
+        font-size: 11px;
+      }
+
+      .stat-value {
+        margin: 0;
+        color: #fff;
+        font-size: 28px;
+        font-weight: 900;
+      }
+
+      .stat-value.khaki {
+        color: var(--khaki);
+      }
+
+      .stat-value.success {
+        color: var(--success);
+      }
+
+      .stat-unit {
+        color: var(--khaki);
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .stat-value.khaki .stat-unit,
+      .stat-value.success .stat-unit {
+        color: #85858b;
+      }
+
+      .section-card {
+        padding: 22px;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .section-title i {
+        color: var(--khaki);
+      }
+
+      .section-note {
+        margin: 0;
+        color: var(--muted-dark);
+        font-size: 11px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 640px;
+        border-collapse: collapse;
+        font-size: 12px;
+        text-align: right;
+      }
+
+      th {
+        padding: 0 0 13px;
+        color: var(--muted-dark);
+        font-size: 11px;
+        font-weight: 500;
+        border-bottom: 1px solid #2b2926;
+      }
+
+      td {
+        padding: 15px 0;
+        color: #c4c4c9;
+        border-bottom: 1px solid rgba(45, 40, 34, 0.6);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .event-name {
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .axis {
+        color: var(--khaki);
+      }
+
+      .date {
+        color: #85858b;
+        direction: ltr;
+        text-align: right;
+      }
+
+      .download-button {
+        padding: 0;
+        color: #f87171;
+        background: transparent;
+        border: 0;
+        font-size: 11px;
+      }
+
+      .download-button:hover {
+        color: #fca5a5;
+        text-decoration: underline;
+      }
+
+      .report-form {
+        display: grid;
+        gap: 25px;
+        padding: 25px;
+      }
+
+      .form-section {
+        display: grid;
+        gap: 14px;
+      }
+
+      .form-section-title {
+        margin: 0;
+        padding-bottom: 10px;
+        color: var(--khaki);
+        font-size: 14px;
+        border-bottom: 1px solid var(--line-soft);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+      }
+
+      .form-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field label {
+        color: #a1a1aa;
+        font-size: 11px;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        color: #fff;
+        background: #101010;
+        border: 1px solid #3a3732;
+        border-radius: 9px;
+        outline: none;
+        transition: border 160ms ease, box-shadow 160ms ease;
+      }
+
+      .field input,
+      .field select {
+        height: 43px;
+        padding: 0 12px;
+      }
+
+      .field textarea {
+        min-height: 82px;
+        padding: 11px 12px;
+        resize: vertical;
+        line-height: 1.7;
+      }
+
+      .field input::placeholder,
+      .field textarea::placeholder {
+        color: #65656b;
+      }
+
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: var(--khaki-dark);
+        box-shadow: 0 0 0 3px rgba(200, 171, 131, 0.09);
+      }
+
+      .field input[type="url"] {
+        color: #6ee7b7;
+        direction: ltr;
+        text-align: left;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      .qr-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .qr-preview {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 12px;
+        background: #101010;
+        border: 1px solid #302c27;
+        border-radius: 13px;
+      }
+
+      .qr-preview[hidden] {
+        display: none;
+      }
+
+      .qr-preview canvas,
+      .qr-preview img {
+        display: block;
+        width: 104px !important;
+        height: 104px !important;
+        padding: 7px;
+        background: #fff;
+        border-radius: 4px;
+      }
+
+      .qr-caption {
+        color: #77777d;
+        font-size: 10px;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-start;
+        padding-top: 2px;
+      }
+
+      .scout-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .summary-item {
+        padding: 15px;
+        border: 1px solid var(--line-soft);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.16);
+      }
+
+      .summary-item strong {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--khaki);
+        font-size: 19px;
+      }
+
+      .summary-item span {
+        color: var(--muted-dark);
+        font-size: 10px;
+      }
+
+      .empty-state {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 30px 20px 34px;
+        color: #94949b;
+        text-align: center;
+        border-top: 1px solid var(--line-soft);
+      }
+
+      .empty-state i {
+        margin-bottom: 4px;
+        color: var(--khaki);
+        font-size: 28px;
+      }
+
+      .empty-state p {
+        margin: 0;
+        font-size: 12px;
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        z-index: 20;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(8px);
+      }
+
+      .modal-backdrop[hidden] {
+        display: none;
+      }
+
+      .login-card {
+        width: min(100%, 420px);
+        padding: 28px;
+        text-align: center;
+        background: linear-gradient(145deg, #1d1a17, #131210);
+        border: 1px solid rgba(200, 171, 131, 0.32);
+        border-radius: 20px;
+        box-shadow: 0 28px 100px rgba(0, 0, 0, 0.55);
+        animation: modal-in 200ms ease both;
+      }
+
+      @keyframes modal-in {
+        from {
+          opacity: 0;
+          transform: scale(0.97) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .login-mark {
+        width: 66px;
+        height: 66px;
+        margin: 0 auto 16px;
+        font-size: 28px;
+      }
+
+      .login-title {
+        margin: 0;
+        color: #fff;
+        font-size: 21px;
+        font-weight: 900;
+      }
+
+      .login-subtitle {
+        margin: 6px 0 22px;
+        color: var(--khaki);
+        font-size: 11px;
+      }
+
+      .login-form {
+        display: grid;
+        gap: 14px;
+        text-align: right;
+      }
+
+      .login-form .primary-button {
+        width: 100%;
+        margin-top: 4px;
+        color: #fff;
+        background: var(--brown);
+        border-color: rgba(200, 171, 131, 0.45);
+      }
+
+      .login-form .primary-button:hover {
+        background: #865e39;
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 30;
+        right: 24px;
+        bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        max-width: min(360px, calc(100vw - 32px));
+        padding: 13px 16px;
+        color: #d1fae5;
+        background: #123326;
+        border: 1px solid #1e6b4a;
+        border-radius: 12px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        font-size: 12px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .print-report {
+        display: none;
+      }
+
+      @media (max-width: 900px) {
+        :root {
+          --sidebar-width: 232px;
+        }
+
+        .main {
+          padding: 30px 24px 52px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 680px) {
+        .app-shell {
+          display: block;
+        }
+
+        .sidebar {
+          width: 100%;
+          padding: 16px;
+          border-left: 0;
+          border-bottom: 1px solid #252525;
+        }
+
+        .brand {
+          margin-bottom: 15px;
+          padding-bottom: 15px;
+        }
+
+        .nav {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 6px;
+        }
+
+        .nav-button {
+          justify-content: center;
+          gap: 7px;
+          min-height: 44px;
+          padding: 9px 7px;
+          font-size: 10px;
+          text-align: center;
+        }
+
+        .nav-button i {
+          width: auto;
+          font-size: 13px;
+        }
+
+        .user-card {
+          display: none;
+        }
+
+        .main {
+          padding: 25px 16px 42px;
+        }
+
+        .page-heading {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .page-heading .primary-button {
+          width: 100%;
+        }
+
+        .section-card,
+        .report-form {
+          padding: 17px;
+        }
+
+        .form-grid,
+        .form-grid.three,
+        .scout-summary {
+          grid-template-columns: 1fr;
+        }
+
+        .form-actions .danger-button {
+          width: 100%;
+        }
+
+        .toast {
+          right: 16px;
+          bottom: 16px;
+        }
+      }
+
+      @media print {
+        body {
+          color: #111;
+          background: #fff;
+        }
+
+        .app-shell,
+        .modal-backdrop,
+        .toast {
+          display: none !important;
+        }
+
+        .print-report {
+          display: block;
+          padding: 36px;
+          color: #111;
+          direction: rtl;
+          font-family: "Tajawal", sans-serif;
+        }
+
+        .print-report h1 {
+          margin: 0 0 4px;
+          font-size: 24px;
+        }
+
+        .print-report h2 {
+          margin: 0 0 24px;
+          color: #745332;
+          font-size: 16px;
+          font-weight: 500;
+        }
+
+        .print-report dl {
+          display: grid;
+          grid-template-columns: 170px 1fr;
+          gap: 0;
+          margin: 0;
+          border: 1px solid #c7c7c7;
+        }
+
+        .print-report dt,
+        .print-report dd {
+          margin: 0;
+          padding: 10px 12px;
+          border-bottom: 1px solid #ddd;
+        }
+
+        .print-report dt {
+          font-weight: 700;
+          background: #f4efe8;
+        }
+
+        .print-report dd {
+          border-right: 1px solid #ddd;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login-modal" class="modal-backdrop">
+      <section class="login-card" aria-labelledby="login-title">
+        <div class="login-mark" aria-hidden="true">⚜️</div>
+        <h1 id="login-title" class="login-title">فرقة متقدم النعيم الكشفي</h1>
+        <p class="login-subtitle">تسجيل الدخول للنظام الإداري</p>
+
+        <form id="login-form" class="login-form">
+          <div class="field">
+            <label for="user-role">نوع المستخدم / الصلاحية</label>
+            <select id="user-role">
+              <option value="قائد الفرقة">قائد الفرقة (Admin)</option>
+              <option value="العريف الأول / عريف طليعة">العريف الأول / عريف طليعة (Sub-Admin)</option>
+              <option value="كشاف">كشاف (عضو - قراءة فقط)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="username">اسم المستخدم أو البريد</label>
+            <input id="username" type="text" value="al-naaim_scout" required autocomplete="username" />
+          </div>
+          <div class="field">
+            <label for="password">كلمة المرور</label>
+            <input id="password" type="password" value="scout2026" required autocomplete="current-password" />
+          </div>
+          <button class="primary-button" type="submit">
+            تسجيل الدخول <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          </button>
+        </form>
+      </section>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">⚜️</div>
+            <div>
+              <p class="brand-title">متقدم النعيم</p>
+              <p class="brand-subtitle">منظومة التقارير والإدارة</p>
+            </div>
+          </div>
+
+          <nav class="nav" aria-label="التنقل الرئيسي">
+            <button class="nav-button active" data-view="dashboard" type="button">
+              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+              <span>الرئيسية والإحصائيات</span>
+            </button>
+            <button class="nav-button" data-view="report-form" type="button">
+              <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
+              <span>إنشاء تقرير جديد</span>
+            </button>
+            <button class="nav-button" data-view="scouts" type="button">
+              <i class="fa-solid fa-users" aria-hidden="true"></i>
+              <span>سجل الكشافة والطلائع</span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="user-card">
+          <div>
+            <p id="logged-user-role" class="user-role">قائد الفرقة</p>
+            <p class="user-team">فرقة متقدم النعيم</p>
+          </div>
+          <button id="logout-button" class="logout-button" type="button" aria-label="تسجيل الخروج">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section id="view-dashboard" class="view" data-view-panel="dashboard">
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">العام الكشفي 2026 — 2027م</p>
+              <h2 class="page-title">لوحة التحكم الإدارية</h2>
+              <p class="page-description">ملخص أنشطة وإحصائيات فرقة متقدم النعيم الكشفي</p>
+            </div>
+            <button class="primary-button" data-go-view="report-form" type="button">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              إنشاء تقرير جديد
+            </button>
+          </header>
+
+          <div class="stats-grid" aria-label="إحصائيات الفرقة">
+            <article class="card stat-card">
+              <p class="stat-label">إجمالي الكشافة</p>
+              <p class="stat-value">24 <span class="stat-unit">كشاف</span></p>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">التقارير الموثقة</p>
+              <p class="stat-value khaki">12 <span class="stat-unit">تقرير</span></p>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">عدد الطلائع</p>
+              <p class="stat-value">3 <span class="stat-unit">طلائع</span></p>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">نسبة الحضور العامة</p>
+              <p class="stat-value success">92%</p>
+            </article>
+          </div>
+
+          <section class="card section-card">
+            <div class="section-heading">
+              <h3 class="section-title">
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                أحدث التقارير الكشفية الموثقة
+              </h3>
+              <p class="section-note">آخر تحديث: اليوم</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>اسم الفعالية</th>
+                    <th>المحور</th>
+                    <th>التاريخ</th>
+                    <th>الإجراء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="event-name">رحلة الخلاء والتطبيق الخارجي</td>
+                    <td class="axis">الكشفي والتربوي</td>
+                    <td class="date">2026-09-10</td>
+                    <td>
+                      <button class="download-button" data-report="رحلة الخلاء والتطبيق الخارجي" type="button">
+                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> عرض التقرير
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="event-name">حملة تنظيف شاطئ النعيم</td>
+                    <td class="axis">الخدمة المجتمعية</td>
+                    <td class="date">2026-08-28</td>
+                    <td>
+                      <button class="download-button" data-report="حملة تنظيف شاطئ النعيم" type="button">
+                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> عرض التقرير
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-report-form" class="view" data-view-panel="report-form" hidden>
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">نموذج رسمي معتمد</p>
+              <h2 class="page-title">تعبئة نموذج تقرير فعالية كشفية</h2>
+              <p class="page-description">سجّل تفاصيل النشاط وسيتم تجهيز نسخة قابلة للطباعة بصيغة PDF.</p>
+            </div>
+          </header>
+
+          <form id="report-form" class="card report-form">
+            <section class="form-section">
+              <h3 class="form-section-title">أولاً: معلومات عامة</h3>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="rep-title">اسم البرنامج / الفعالية *</label>
+                  <input id="rep-title" type="text" required placeholder="مثال: نشاط الخلاء الكشفي" />
+                </div>
+                <div class="field">
+                  <label for="rep-axis">المحور *</label>
+                  <input id="rep-axis" type="text" required placeholder="المجال الكشفي والتربوي" />
+                </div>
+              </div>
+              <div class="form-grid three">
+                <div class="field">
+                  <label for="rep-date">اليوم والتاريخ *</label>
+                  <input id="rep-date" type="date" required />
+                </div>
+                <div class="field">
+                  <label for="rep-target">الفئة المستهدفة</label>
+                  <input id="rep-target" type="text" value="كشافة فرقة المتقدم" />
+                </div>
+                <div class="field">
+                  <label for="rep-count">عدد المستفيدين</label>
+                  <input id="rep-count" type="number" min="1" value="24" />
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="form-section-title">ثانياً: أهداف البرنامج</h3>
+              <div class="field">
+                <label for="rep-general-goal">الهدف العام</label>
+                <textarea id="rep-general-goal" placeholder="تعزيز المهارات الحياتية والكشفية..."></textarea>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="form-section-title">ثالثاً: تغطية الفيديو (QR Code)</h3>
+              <div class="qr-row">
+                <div class="field" style="flex: 1 1 300px">
+                  <label for="rep-video-url">رابط فيديو النشاط (سيتم تحويله تلقائياً لرمز QR)</label>
+                  <input id="rep-video-url" type="url" placeholder="https://..." />
+                </div>
+                <div id="qr-preview-container" class="qr-preview" hidden>
+                  <div id="qrcode" aria-label="معاينة رمز QR"></div>
+                  <span class="qr-caption">معاينة رمز الـ QR المطبوع</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="form-actions">
+              <button class="danger-button" type="submit">
+                <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                تجهيز التقرير للطباعة / PDF
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section id="view-scouts" class="view" data-view-panel="scouts" hidden>
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">البيانات الأساسية</p>
+              <h2 class="page-title">سجل بيانات فرقة متقدم النعيم</h2>
+              <p class="page-description">بيانات الكشافة والطلائع المسجلة في المنظومة.</p>
+            </div>
+          </header>
+
+          <section class="card section-card">
+            <div class="scout-summary">
+              <div class="summary-item"><strong>24</strong><span>إجمالي الكشافة</span></div>
+              <div class="summary-item"><strong>3</strong><span>الطلائع المسجلة</span></div>
+              <div class="summary-item"><strong>92%</strong><span>متوسط الحضور</span></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>الطليعة</th>
+                    <th>الرتبة</th>
+                    <th>الحضور</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="event-name">عبدالله محمد</td>
+                    <td class="axis">طليعة الصقر</td>
+                    <td>كشاف متقدم</td>
+                    <td class="success">96%</td>
+                  </tr>
+                  <tr>
+                    <td class="event-name">يوسف علي</td>
+                    <td class="axis">طليعة النسر</td>
+                    <td>كشاف متقدم</td>
+                    <td class="success">92%</td>
+                  </tr>
+                  <tr>
+                    <td class="event-name">حسن أحمد</td>
+                    <td class="axis">طليعة الذئب</td>
+                    <td>كشاف</td>
+                    <td class="success">88%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="print-report" class="print-report" aria-hidden="true"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      <span id="toast-message"></span>
+    </div>
+
+    <script>
+      const loginModal = document.getElementById("login-modal");
+      const loggedUserRole = document.getElementById("logged-user-role");
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toast-message");
+      let toastTimer;
+
+      function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.add("visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("visible"), 3200);
+      }
+
+      function switchView(viewName) {
+        document.querySelectorAll("[data-view-panel]").forEach((panel) => {
+          panel.hidden = panel.dataset.viewPanel !== viewName;
+        });
+        document.querySelectorAll(".nav-button").forEach((button) => {
+          button.classList.toggle("active", button.dataset.view === viewName);
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      document.querySelectorAll(".nav-button").forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.view));
+      });
+
+      document.querySelectorAll("[data-go-view]").forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.goView));
+      });
+
+      document.getElementById("login-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        loggedUserRole.textContent = document.getElementById("user-role").value;
+        loginModal.hidden = true;
+        showToast("تم تسجيل الدخول إلى منظومة الفرقة بنجاح");
+      });
+
+      document.getElementById("logout-button").addEventListener("click", () => {
+        loginModal.hidden = false;
+      });
+
+      const qrContainer = document.getElementById("qr-preview-container");
+      const qrTarget = document.getElementById("qrcode");
+      document.getElementById("rep-video-url").addEventListener("input", (event) => {
+        const url = event.target.value.trim();
+        qrTarget.replaceChildren();
+        if (!url) {
+          qrContainer.hidden = true;
+          return;
+        }
+        qrContainer.hidden = false;
+        new QRCode(qrTarget, {
+          text: url,
+          width: 104,
+          height: 104,
+          correctLevel: QRCode.CorrectLevel.M,
+        });
+      });
+
+      function formatDate(dateValue) {
+        if (!dateValue) return "غير محدد";
+        return new Intl.DateTimeFormat("ar-BH", {
+          dateStyle: "long",
+        }).format(new Date(`${dateValue}T00:00:00`));
+      }
+
+      document.getElementById("report-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const title = document.getElementById("rep-title").value.trim();
+        const axis = document.getElementById("rep-axis").value.trim();
+        const date = document.getElementById("rep-date").value;
+        const target = document.getElementById("rep-target").value.trim();
+        const count = document.getElementById("rep-count").value;
+        const goal = document.getElementById("rep-general-goal").value.trim() || "لم يتم إدخال هدف عام.";
+        const videoUrl = document.getElementById("rep-video-url").value.trim() || "لا يوجد رابط فيديو مرفق.";
+
+        document.getElementById("print-report").innerHTML = `
+          <h1>فرقة متقدم النعيم الكشفي</h1>
+          <h2>تقرير فعالية كشفية — ${title}</h2>
+          <dl>
+            <dt>اسم الفعالية</dt><dd>${title}</dd>
+            <dt>المحور</dt><dd>${axis}</dd>
+            <dt>التاريخ</dt><dd>${formatDate(date)}</dd>
+            <dt>الفئة المستهدفة</dt><dd>${target}</dd>
+            <dt>عدد المستفيدين</dt><dd>${count}</dd>
+            <dt>الهدف العام</dt><dd>${goal}</dd>
+            <dt>رابط التغطية</dt><dd>${videoUrl}</dd>
+          </dl>
+        `;
+        showToast("تم تجهيز التقرير، اختر الطباعة ثم حفظ بصيغة PDF");
+        window.print();
+      });
+
+      document.querySelectorAll("[data-report]").forEach((button) => {
+        button.addEventListener("click", () => {
+          showToast(`تم فتح خيارات تقرير: ${button.dataset.report}`);
+        });
+      });
+
+      document.getElementById("rep-date").value = new Date().toISOString().slice(0, 10);
+    </script>
+  </body>
+</html>

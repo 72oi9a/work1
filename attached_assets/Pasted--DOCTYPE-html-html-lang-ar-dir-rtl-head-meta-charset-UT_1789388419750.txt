@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة فرقة متقدم النعيم الكشفي</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #0b0b0b; color: #f3f4f6; }
+        .bg-scout-card { background-color: #161513; border: 1px solid #2d2822; }
+        .text-khaki { color: #C8AB83; }
+        .bg-khaki { background-color: #C8AB83; }
+        .border-khaki { border-color: #C8AB83; }
+        .bg-brown-scout { background-color: #725032; }
+        .active-tab { background-color: #725032; color: #ffffff; border-color: #C8AB83; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- LOGIN SCREEN MODAL (Simulated Access Control) -->
+    <div id="login-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-scout-card max-w-md w-full p-6 rounded-2xl border border-khaki/30 text-center shadow-2xl">
+            <div class="w-16 h-16 rounded-full border-2 border-khaki flex items-center justify-center bg-zinc-900 text-khaki font-bold text-2xl mx-auto mb-4">
+                ⚜️
+            </div>
+            <h2 class="text-xl font-black text-white mb-1">فرقة متقدم النعيم الكشفي</h2>
+            <p class="text-xs text-khaki mb-6">تسجيل الدخول للنظام الإداري</p>
+            
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-right">
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">نوع المستخدم / الصلاحية</label>
+                    <select id="user-role" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-khaki">
+                        <option value="قائد الفرقة (Admin)">قائد الفرقة (Admin)</option>
+                        <option value="العريف الأول / عريف طليعة">العريف الأول / عريف طليعة (Sub-Admin)</option>
+                        <option value="كشاف (عضو)">كشاف (عضو - قراءة فقط)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم أو البريد</label>
+                    <input type="text" required value="al-naaim_scout" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-khaki">
+                </div>
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label>
+                    <input type="password" required value="••••••••" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-khaki">
+                </div>
+                <button type="submit" class="w-full bg-brown-scout hover:bg-amber-800 text-white font-bold text-sm py-3 rounded-xl border border-khaki/40 transition">
+                    تسجيل الدخول <i class="fa-solid fa-arrow-left mr-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-64 bg-black border-b md:border-b-0 md:border-l border-zinc-800 p-5 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Header Logo -->
+            <div class="flex items-center gap-3 mb-8 pb-4 border-b border-zinc-800">
+                <div class="w-10 h-10 rounded-full border border-khaki flex items-center justify-center bg-zinc-900 text-khaki font-bold text-lg">
+                    ⚜️
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-white leading-tight">متقدم النعيم</h1>
+                    <p class="text-[10px] text-khaki">منظومة التقارير والإدارة</p>
+                </div>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="space-y-2">
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs transition active-tab">
+                    <i class="fa-solid fa-chart-pie text-base"></i>
+                    <span>الرئيسية والإحصائيات</span>
+                </button>
+                <button onclick="switchView('report-form')" id="nav-report-form" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs transition text-zinc-400 hover:bg-zinc-900 hover:text-white">
+                    <i class="fa-solid fa-file-circle-plus text-base"></i>
+                    <span>إنشاء تقرير جديد (PDF)</span>
+                </button>
+                <button onclick="switchView('scouts')" id="nav-scouts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-xs transition text-zinc-400 hover:bg-zinc-900 hover:text-white">
+                    <i class="fa-solid fa-users text-base"></i>
+                    <span>سجل الكشافة والطلائع</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- User Profile Info -->
+        <div class="mt-8 pt-4 border-t border-zinc-800 flex items-center justify-between">
+            <div>
+                <div id="logged-user-role" class="text-xs font-bold text-khaki">قائد الفرقة</div>
+                <div class="text-[10px] text-zinc-500">فرقة متقدم النعيم</div>
+            </div>
+            <button onclick="logout()" class="text-red-500 hover:text-red-400 text-xs p-2">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
+        
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
+        <section id="view-dashboard" class="space-y-6">
+            <!-- Top Banner -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-white">لوحة التحكم الإدارية</h2>
+                    <p class="text-xs text-zinc-400">ملخص أنشطة وإحصائيات فرقة متقدم النعيم الكشفي 2026-2027م</p>
+                </div>
+                <button onclick="switchView('report-form')" class="bg-khaki hover:bg-amber-600 text-black font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> إنشـاء تقـرير جديـد
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-scout-card p-4 rounded-xl">
+                    <div class="text-xs text-zinc-400 mb-1">إجمالي الكشافة</div>
+                    <div class="text-2xl font-black text-white">24 <span class="text-xs font-normal text-khaki">كشاف</span></div>
+                </div>
+                <div class="bg-scout-card p-4 rounded-xl">
+                    <div class="text-xs text-zinc-400 mb-1">التقارير الموثقة</div>
+                    <div class="text-2xl font-black text-khaki">12 <span class="text-xs font-normal text-zinc-400">تقرير</span></div>
+                </div>
+                <div class="bg-scout-card p-4 rounded-xl">
+                    <div class="text-xs text-zinc-400 mb-1">عدد الطلائع</div>
+                    <div class="text-2xl font-black text-white">3 <span class="text-xs font-normal text-khaki">طلائع</span></div>
+                </div>
+                <div class="bg-scout-card p-4 rounded-xl">
+                    <div class="text-xs text-zinc-400 mb-1">نسبة الحضور العامة</div>
+                    <div class="text-2xl font-black text-emerald-400">92%</div>
+                </div>
+            </div>
+
+            <!-- Recent Reports Table -->
+            <div class="bg-scout-card p-5 rounded-2xl">
+                <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-khaki"></i> أحدث التقارير الكشفية الموثقة
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead class="text-zinc-500 border-b border-zinc-800">
+                            <tr>
+                                <th class="pb-3">اسم الفعالية</th>
+                                <th class="pb-3">المحور</th>
+                                <th class="pb-3">التاريخ</th>
+                                <th class="pb-3">الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-800/50 text-zinc-300">
+                            <tr>
+                                <td class="py-3 font-medium text-white">رحلة الخلاء والتطبيق الخارجي</td>
+                                <td class="py-3 text-khaki">الكشفي والتربوي</td>
+                                <td class="py-3 text-zinc-400">2026-09-10</td>
+                                <td class="py-3"><button onclick="alert('تنزيل التقرير...')" class="text-red-400 hover:underline"><i class="fa-solid fa-file-pdf"></i> تنزيل</button></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 font-medium text-white">حملة تنظيف شاطئ النعيم</td>
+                                <td class="py-3 text-khaki">الخدمة المجتمعية</td>
+                                <td class="py-3 text-zinc-400">2026-08-28</td>
+                                <td class="py-3"><button onclick="alert('تنزيل التقرير...')" class="text-red-400 hover:underline"><i class="fa-solid fa-file-pdf"></i> تنزيل</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: REPORT CREATION FORM -->
+        <section id="view-report-form" class="space-y-6 hidden">
+            <div>
+                <h2 class="text-2xl font-black text-white">تعبئة نموذج تقرير فعالية كشفية</h2>
+                <p class="text-xs text-zinc-400">النموذج الرسمي المعتمد لعام 2026-2027م</p>
+            </div>
+
+            <form onsubmit="generateReport(event)" class="bg-scout-card p-6 rounded-2xl space-y-5 text-xs">
+                <!-- 1. معلومات عامة -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-khaki border-b border-zinc-800 pb-2">أولاً: معلومات عامة</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-zinc-400 mb-1">اسم البرنامج / الفعالية *</label>
+                            <input id="rep-title" type="text" required placeholder="مثال: نشاط الخلاء الكشفي" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-khaki">
+                        </div>
+                        <div>
+                            <label class="block text-zinc-400 mb-1">المحور *</label>
+                            <input id="rep-axis" type="text" required placeholder="المجالي الكشفي والتربوي" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-khaki">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-zinc-400 mb-1">اليوم والتاريخ</label>
+                            <input id="rep-date" type="date" required class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-zinc-400 mb-1">الفئة المستهدفة</label>
+                            <input id="rep-target" type="text" value="كشافة فرقة المتقدم" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-zinc-400 mb-1">عدد المستفيدين</label>
+                            <input id="rep-count" type="number" value="24" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. الأهداف -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-khaki border-b border-zinc-800 pb-2">ثانياً: أهداف البرنامج</h3>
+                    <div>
+                        <label class="block text-zinc-400 mb-1">الهدف العام</label>
+                        <textarea id="rep-general-goal" rows="2" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white focus:outline-none" placeholder="تعزيز المهارات الحياتية والكشفية..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 3. الوسائط والـ QR -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-khaki border-b border-zinc-800 pb-2">ثالثاً: تغطية الفيديو (QR Code)</h3>
+                    <div>
+                        <label class="block text-zinc-400 mb-1">رابط فيديو النشاط (سيتم تحويله تلقائياً لرمز QR)</label>
+                        <input id="rep-video-url" type="url" oninput="generateQRPreview(this.value)" placeholder="https://..." class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-emerald-400 font-mono focus:outline-none">
+                    </div>
+                    <!-- Live QR Preview Box -->
+                    <div id="qr-preview-container" class="hidden flex-col items-center justify-center p-3 bg-zinc-900 rounded-xl border border-zinc-800 w-fit">
+                        <div id="qrcode"></div>
+                        <span class="text-[10px] text-zinc-500 mt-2">معاينة رمز الـ QR المطبوع</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4 flex justify-end">
+                    <button type="submit" class="bg-red-700 hover:bg-red-600 text-white font-bold text-xs px-6 py-3 rounded-xl flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf"></i> توليد وتحميل التقرير (PDF)
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- VIEW 3: SCOUTS LIST -->
+        <section id="view-scouts" class="space-y-6 hidden">
+            <div>
+                <h2 class="text-2xl font-black text-white">سجل بيانات فرقة متقدم النعيم</h2>
+                <p class="text-xs text-zinc-400">بيانات الكشافة والطلائع المسجلة</p>
+            </div>
+            <div class="bg-scout-card p-5 rounded-2xl text-xs text-zinc-400 text-center py-12">
+                <i class="fa-solid fa-users text-3xl text-khaki mb-2"></i>
+                <p>قائمة الكشافة متصلة بقاعدة البيانات.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS LOGIC -->
+    <script>
+        let qrGenerator = null;
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const role = document.getElementById('user-role').value;
+            document.getElementById('logged-user-role').innerText = role;
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function logout() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-zinc-400');
+            });
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            activeNav.classList.add('active-tab');
+            activeNav.classList.remove('text-zinc-400');
+        }
+
+        function generateQRPreview(url) {
+            const container = document.getElementById('qr-preview-container');
+            const qrDiv = document.getElementById('qrcode');
+            if(!url) {
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            qrDiv.innerHTML = "";
+            new QRCode(qrDiv, {
+                text: url,
+                width: 90,
+                height: 90
+            });
+        }
+
+        function generateReport(e) {
+            e.preventDefault();
+            alert("تم جمع البيانات وتوليد التقرير بنجاح! جاهز للتنزيل المباشر بصيغة PDF.");
+        }
+    </script>
+</body>
+</html>
