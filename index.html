@@ -1281,6 +1281,103 @@
           height: 31mm;
         }
 
+        .activity-print {
+          padding: 5mm 14mm 13mm;
+        }
+
+        .activity-print .official-header {
+          display: none;
+        }
+
+        .activity-print h1 {
+          margin: 10mm 0 8mm;
+          font-size: 20px;
+          line-height: 1.35;
+        }
+
+        .activity-print .print-section-title {
+          width: 86%;
+          margin: 5mm auto 1mm;
+          color: #a70c0c;
+          font-size: 14px;
+          line-height: 1.5;
+          text-align: right;
+        }
+
+        .activity-print .template-print-table {
+          width: 86%;
+          margin: 0 auto 8mm;
+          font-size: 10px;
+        }
+
+        .activity-print .template-print-table th,
+        .activity-print .template-print-table td {
+          min-height: 9mm;
+          padding: 2mm 3mm;
+          border: 1px solid #fff;
+        }
+
+        .activity-print .template-print-table th {
+          color: #fff;
+          background: #a8a8a8;
+          font-weight: 500;
+        }
+
+        .activity-print .template-print-table td {
+          color: #111;
+          background: #e1e1e1;
+          text-align: center;
+        }
+
+        .activity-print .template-print-table .large-cell {
+          min-height: 18mm;
+          color: #111;
+          background: #e1e1e1;
+          text-align: right;
+        }
+
+        .activity-print .print-description {
+          width: 86%;
+          min-height: 25mm;
+          margin: 0 auto 2mm;
+          padding: 3mm;
+          color: #111;
+          background: #e1e1e1;
+          border: 1px solid #fff;
+        }
+
+        .activity-photos-page {
+          padding-top: 20mm;
+        }
+
+        .activity-photos-page .print-section-title {
+          margin-top: 0;
+          margin-bottom: 8mm;
+        }
+
+        .activity-photos-page .photo-grid {
+          width: 100%;
+          margin: 0 0 12mm;
+          gap: 5mm 8mm;
+        }
+
+        .activity-photos-page .photo-box {
+          height: 53mm;
+          border-radius: 10mm;
+        }
+
+        .activity-photos-page .qr-print-title {
+          margin-top: 3mm;
+          color: #a70c0c;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .activity-photos-page .qr-print-box {
+          width: 38mm;
+          height: 38mm;
+        }
+
         .meeting-print::before,
         .meeting-print::after {
           display: none;
@@ -2391,7 +2488,7 @@
               </div>
               <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
             </div>
-            <h1>نموذج تقرير فعالية كشفية العام الدراسي 2026-2027م</h1>
+            <h1>نموذج تقرير فعالية كشفية العام الدراسي 2027-2026م</h1>
             <div class="print-section-title">أولاً: معلومات عامة:</div>
             <table class="template-print-table">
               <tr><th>اسم البرنامج</th><td>${value("act-title")}</td><th>المحور</th><td>${value("act-axis")}</td></tr>
@@ -2414,7 +2511,7 @@
               <tr><th colspan="2">فرص التحسين والتطوير</th><td colspan="2" class="large-cell">${value("act-improvements")}</td></tr>
             </table>
           </div>
-          <div class="official-page activity-print">
+          <div class="official-page activity-print activity-photos-page">
             <div class="official-header">
               <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
               <div class="official-header-center">
