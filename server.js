@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const crypto = require("crypto");
@@ -21,6 +23,15 @@ const SESSION_COOKIE = "scout_session";
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 app.use(express.static(path.join(__dirname)));
+
+app.get("/api/health", async (request, response) => {
+  try {
+    await pool.query("SELECT 1");
+    response.json({ ok: true, database: "connected", service: "scout-management" });
+  } catch (error) {
+    response.status(503).json({ ok: false, database: "unavailable", error: "قاعدة البيانات غير متاحة" });
+  }
+});
 
 // ==========================================
 // 1. الدوارل المساعدة والتشفير (Helper Functions)
@@ -588,6 +599,34 @@ app.delete("/api/members/:id", requireAuth, requirePermission("members", "delete
 });
 
 // إدارة التقارير
+app.get("/api/reports", requireAuth, requirePermission("reports"), async (request, response, next) => {
+  try {
+    const [activities, meetings] = await Promise.all([
+      pool.query(
+        `SELECT id, title, axis AS category, activity_date AS report_date, data, 'activity' AS type, created_at
+           FROM activity_reports
+          ORDER BY activity_date DESC NULLS LAST, created_at DESC`
+      ),
+      pool.query(
+        `SELECT id, title, 'محضر اجتماع مجلس الشرف' AS category, meeting_date AS report_date, data, 'meeting' AS type, created_at
+           FROM meeting_minutes
+          ORDER BY meeting_date DESC NULLS LAST, created_at DESC`
+      )
+    ]);
+
+    const reports = [...activities.rows, ...meetings.rows]
+      .map((report) => ({
+        ...report,
+        date: report.report_date || report.created_at,
+      }))
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    response.json({ reports });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api/reports/activity", requireAuth, requirePermission("reports", "create"), async (request, response, next) => {
   try {
     const { title, axis, activityDate, data } = request.body || {};

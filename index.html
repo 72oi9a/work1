@@ -1243,7 +1243,7 @@
     <div id="login-modal" class="modal-backdrop">
       <section class="login-card" aria-labelledby="login-title">
         <div class="login-mark" aria-hidden="true">
-          <img src="/attached_assets/image_1789389348245.png" alt="" />
+          <img src="/attached_assets/image_1789389348245.png" alt="شعار فرقة متقدم النعيم الكشفية" />
         </div>
         <h1 id="login-title" class="login-title">فرقة متقدم النعيم الكشفي</h1>
         <p class="login-subtitle">تسجيل الدخول للنظام الإداري</p>
@@ -1269,7 +1269,7 @@
         <div>
           <div class="brand">
             <div class="brand-mark" aria-hidden="true">
-              <img src="/attached_assets/image_1789389348245.png" alt="" />
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار فرقة متقدم النعيم الكشفية" />
             </div>
             <div>
               <p class="brand-title">متقدم النعيم</p>
@@ -1285,6 +1285,10 @@
             <button class="nav-button" data-view="official-forms" type="button">
               <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
               <span>النماذج الرسمية</span>
+            </button>
+            <button class="nav-button" data-view="reports" type="button">
+              <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+              <span>التقارير</span>
             </button>
             <button class="nav-button" data-view="members" type="button">
               <i class="fa-solid fa-users" aria-hidden="true"></i>
@@ -1578,7 +1582,46 @@
           </div>
         </section>
 
-        <section id="view-scouts" class="view" data-view-panel="scouts" hidden>
+        <section id="view-reports" class="view" data-view-panel="reports" hidden>
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">البنية الرسمية</p>
+              <h2 class="page-title">سجل جميع التقارير</h2>
+              <p class="page-description">عرض تقارير الأنشطة والاجتماعات المسجلة في قاعدة البيانات.</p>
+            </div>
+            <button class="primary-button" data-go-view="official-forms" type="button">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              إنشاء تقرير جديد
+            </button>
+          </header>
+
+          <section class="card section-card">
+            <div class="section-heading">
+              <h3 class="section-title">
+                <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                تقارير الفرقة
+              </h3>
+              <p id="reports-count" class="section-note">0 تقرير</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>النوع</th>
+                    <th>العنوان</th>
+                    <th>المحور</th>
+                    <th>التاريخ</th>
+                  </tr>
+                </thead>
+                <tbody id="reports-list">
+                  <tr><td colspan="4" class="section-note">جاري تحميل التقارير...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-members" class="view" data-view-panel="members" hidden>
           <header class="page-heading">
             <div>
               <p class="eyebrow">البيانات الأساسية</p>
@@ -1589,9 +1632,9 @@
 
           <section class="card section-card">
             <div class="scout-summary">
-              <div class="summary-item"><strong>24</strong><span>إجمالي الكشافة</span></div>
-              <div class="summary-item"><strong>3</strong><span>الطلائع المسجلة</span></div>
-              <div class="summary-item"><strong>92%</strong><span>متوسط الحضور</span></div>
+              <div class="summary-item"><strong id="members-total">0</strong><span>إجمالي الكشافة</span></div>
+              <div class="summary-item"><strong id="members-patrols">0</strong><span>الطلائع المسجلة</span></div>
+              <div class="summary-item"><strong id="members-attendance">0%</strong><span>متوسط الحضور</span></div>
             </div>
             <div class="table-wrap">
               <table>
@@ -1603,25 +1646,8 @@
                     <th>الحضور</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td class="event-name">عبدالله محمد</td>
-                    <td class="axis">طليعة الصقر</td>
-                    <td>كشاف متقدم</td>
-                    <td class="success">96%</td>
-                  </tr>
-                  <tr>
-                    <td class="event-name">يوسف علي</td>
-                    <td class="axis">طليعة النسر</td>
-                    <td>كشاف متقدم</td>
-                    <td class="success">92%</td>
-                  </tr>
-                  <tr>
-                    <td class="event-name">حسن أحمد</td>
-                    <td class="axis">طليعة الذئب</td>
-                    <td>كشاف</td>
-                    <td class="success">88%</td>
-                  </tr>
+                <tbody id="members-list">
+                  <tr><td colspan="4" class="section-note">جاري تحميل البيانات...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1738,6 +1764,8 @@
       const loggedUserRole = document.getElementById("logged-user-role");
       const toast = document.getElementById("toast");
       const toastMessage = document.getElementById("toast-message");
+      const supervisorsList = document.getElementById("supervisors-list");
+      const supervisorCount = document.getElementById("supervisor-count");
       let toastTimer;
 
       function showToast(message) {
@@ -1757,6 +1785,193 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
+      async function apiFetch(path, options = {}) {
+        const response = await fetch(path, {
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+          ...options,
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "حدث خطأ غير متوقع");
+        }
+
+        return payload;
+      }
+
+      function updateSupervisorCount() {
+        const count = supervisorsList.querySelectorAll("tr").length;
+        supervisorCount.textContent = `${count} مستخدمين`;
+      }
+
+      function initials(name) {
+        return String(name || "").trim().charAt(0) || "م";
+      }
+
+      function renderUserRows(users = []) {
+        supervisorsList.innerHTML = "";
+        users.forEach((user) => {
+          const row = document.createElement("tr");
+          const userCell = document.createElement("td");
+          userCell.className = "event-name";
+          userCell.innerHTML = `<span class="supervisor-avatar">${initials(user.full_name || user.username)}</span>${user.full_name || user.username}<small style="display:block;color:#71717a;font-size:10px;margin-top:3px">${user.username}</small>`;
+
+          const roleCell = document.createElement("td");
+          roleCell.className = "axis";
+          roleCell.textContent = user.role;
+
+          const statusCell = document.createElement("td");
+          statusCell.innerHTML = `<span class="status-pill">${user.active === false ? "غير نشط" : "نشط"}</span>`;
+
+          const actionCell = document.createElement("td");
+          const removeButton = document.createElement("button");
+          removeButton.className = "remove-user-button";
+          removeButton.type = "button";
+          removeButton.dataset.userId = user.id;
+          removeButton.dataset.userName = user.full_name || user.username;
+          removeButton.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i> حذف';
+          actionCell.append(removeButton);
+
+          row.append(userCell, roleCell, statusCell, actionCell);
+          supervisorsList.append(row);
+        });
+        updateSupervisorCount();
+      }
+
+      function renderMembers(members = []) {
+        const membersTable = document.getElementById("members-list");
+        const totalEl = document.getElementById("members-total");
+        const patrolsEl = document.getElementById("members-patrols");
+        const attendanceEl = document.getElementById("members-attendance");
+
+        membersTable.innerHTML = "";
+        if (!members.length) {
+          membersTable.innerHTML = '<tr><td colspan="4" class="section-note">لا توجد بيانات أعضاء.</td></tr>';
+          totalEl.textContent = "0";
+          patrolsEl.textContent = "0";
+          attendanceEl.textContent = "0%";
+          return;
+        }
+
+        const uniquePatrols = new Set(members.filter((member) => member.patrol).map((member) => member.patrol)).size;
+        totalEl.textContent = members.length;
+        patrolsEl.textContent = uniquePatrols;
+        attendanceEl.textContent = "92%";
+
+        members.forEach((member) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="event-name">${member.full_name || "غير محدد"}</td>
+            <td class="axis">${member.patrol || "—"}</td>
+            <td>${member.rank || "—"}</td>
+            <td class="success">92%</td>
+          `;
+          membersTable.append(row);
+        });
+      }
+
+      function renderReports(reports = []) {
+        const reportsTable = document.getElementById("reports-list");
+        const reportsCount = document.getElementById("reports-count");
+        reportsTable.innerHTML = "";
+
+        if (!reports.length) {
+          reportsTable.innerHTML = '<tr><td colspan="4" class="section-note">لا توجد تقارير محفوظة.</td></tr>';
+          reportsCount.textContent = "0 تقرير";
+          return;
+        }
+
+        reportsCount.textContent = `${reports.length} تقرير`;
+
+        reports.forEach((report) => {
+          const row = document.createElement("tr");
+          const typeLabel = report.type === "meeting" ? "محضر اجتماع" : "فعالية كشفية";
+          const reportDate = report.report_date ? new Date(`${report.report_date}T00:00:00`).toLocaleDateString("ar-BH") : new Date(report.created_at).toLocaleDateString("ar-BH");
+          row.innerHTML = `
+            <td class="axis">${typeLabel}</td>
+            <td class="event-name">${report.title || report.category || "تقرير"}</td>
+            <td class="axis">${report.axis || report.category || "—"}</td>
+            <td>${reportDate}</td>
+          `;
+          reportsTable.append(row);
+        });
+      }
+
+      async function loadDashboard() {
+        try {
+          const result = await apiFetch("/api/dashboard");
+          document.getElementById("stat-members").innerHTML = `${result.stats.members} <span class="stat-unit">عضو</span>`;
+          document.getElementById("stat-reports").innerHTML = `${result.stats.reports} <span class="stat-unit">تقرير</span>`;
+          document.getElementById("stat-patrols").innerHTML = `${result.stats.patrols} <span class="stat-unit">طلائع</span>`;
+          document.getElementById("stat-attendance").textContent = `${result.stats.attendance}%`;
+
+          const list = document.getElementById("latest-reports-list");
+          list.innerHTML = "";
+          if (!result.latestReports?.length) {
+            list.innerHTML = '<tr><td colspan="4" class="section-note">لا توجد تقارير حالياً.</td></tr>';
+            return;
+          }
+
+          result.latestReports.forEach((report) => {
+            const row = document.createElement("tr");
+            const date = report.activity_date ? new Date(`${report.activity_date}T00:00:00`).toLocaleDateString("ar-BH") : "غير محدد";
+            row.innerHTML = `
+              <td class="event-name">${report.title}</td>
+              <td class="axis">${report.axis}</td>
+              <td>${date}</td>
+              <td><button class="ghost-button small" type="button">عرض</button></td>
+            `;
+            list.append(row);
+          });
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function loadMembers() {
+        try {
+          const result = await apiFetch("/api/members");
+          renderMembers(result.members || []);
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function loadUsers() {
+        try {
+          const result = await apiFetch("/api/users");
+          renderUserRows(result.users || []);
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function loadReports() {
+        try {
+          const result = await apiFetch("/api/reports");
+          renderReports(result.reports || []);
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function loadSession() {
+        try {
+          const result = await apiFetch("/api/auth/me");
+          const user = result.user;
+          loggedUserRole.textContent = user.role || "المستخدم";
+          loginModal.hidden = true;
+          await Promise.all([loadDashboard(), loadMembers(), loadUsers(), loadReports()]);
+          showToast("تم تسجيل الدخول بنجاح");
+        } catch (error) {
+          loginModal.hidden = false;
+        }
+      }
+
       document.querySelectorAll(".nav-button").forEach((button) => {
         button.addEventListener("click", () => switchView(button.dataset.view));
       });
@@ -1765,69 +1980,70 @@
         button.addEventListener("click", () => switchView(button.dataset.goView));
       });
 
-      document.getElementById("login-form").addEventListener("submit", (event) => {
+      document.getElementById("login-form").addEventListener("submit", async (event) => {
         event.preventDefault();
-        loggedUserRole.textContent = "قائد الفرقة";
-        loginModal.hidden = true;
-        showToast("تم تسجيل الدخول إلى منظومة الفرقة بنجاح");
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+
+        try {
+          const result = await apiFetch("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+          });
+          loggedUserRole.textContent = result.user?.role || "المستخدم";
+          loginModal.hidden = true;
+          await Promise.all([loadDashboard(), loadMembers(), loadUsers(), loadReports()]);
+          showToast("تم تسجيل الدخول إلى منظومة الفرقة بنجاح");
+        } catch (error) {
+          showToast(error.message);
+        }
       });
 
-      document.getElementById("logout-button").addEventListener("click", () => {
-        loginModal.hidden = false;
+      document.getElementById("logout-button").addEventListener("click", async () => {
+        try {
+          await apiFetch("/api/auth/logout", { method: "POST" });
+          loginModal.hidden = false;
+          showToast("تم تسجيل الخروج");
+        } catch (error) {
+          showToast(error.message);
+        }
       });
 
-      const supervisorsList = document.getElementById("supervisors-list");
-      const supervisorCount = document.getElementById("supervisor-count");
-
-      function updateSupervisorCount() {
-        const count = supervisorsList.querySelectorAll("tr").length;
-        supervisorCount.textContent = `${count} مستخدمين`;
-      }
-
-      function initials(name) {
-        return name.trim().charAt(0) || "م";
-      }
-
-      document.getElementById("add-user-form").addEventListener("submit", (event) => {
+      document.getElementById("add-user-form").addEventListener("submit", async (event) => {
         event.preventDefault();
-        const username = document.getElementById("new-user-name").value.trim();
-        const fullName = document.getElementById("new-user-full-name").value.trim();
-        const role = document.getElementById("new-user-role").value;
-        const row = document.createElement("tr");
+        const payload = {
+          username: document.getElementById("new-user-name").value.trim(),
+          fullName: document.getElementById("new-user-full-name").value.trim(),
+          role: document.getElementById("new-user-role").value,
+          password: document.getElementById("new-user-password").value,
+        };
 
-        const userCell = document.createElement("td");
-        userCell.className = "event-name";
-        userCell.innerHTML = `<span class="supervisor-avatar">${initials(fullName)}</span>${fullName}<small style="display:block;color:#71717a;font-size:10px;margin-top:3px">${username}</small>`;
-
-        const roleCell = document.createElement("td");
-        roleCell.className = "axis";
-        roleCell.textContent = role;
-
-        const statusCell = document.createElement("td");
-        statusCell.innerHTML = '<span class="status-pill">نشط</span>';
-
-        const actionCell = document.createElement("td");
-        const removeButton = document.createElement("button");
-        removeButton.className = "remove-user-button";
-        removeButton.type = "button";
-        removeButton.dataset.removeUser = fullName;
-        removeButton.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i> حذف';
-        actionCell.append(removeButton);
-
-        row.append(userCell, roleCell, statusCell, actionCell);
-        supervisorsList.append(row);
-        updateSupervisorCount();
-        event.target.reset();
-        showToast(`تمت إضافة المستخدم ${fullName} بنجاح`);
+        try {
+          await apiFetch("/api/users", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          event.target.reset();
+          await loadUsers();
+          showToast("تمت إضافة المستخدم بنجاح");
+        } catch (error) {
+          showToast(error.message);
+        }
       });
 
-      supervisorsList.addEventListener("click", (event) => {
-        const removeButton = event.target.closest("[data-remove-user]");
+      supervisorsList.addEventListener("click", async (event) => {
+        const removeButton = event.target.closest("[data-user-id]");
         if (!removeButton) return;
-        const userName = removeButton.dataset.removeUser;
-        removeButton.closest("tr").remove();
-        updateSupervisorCount();
-        showToast(`تم حذف المستخدم ${userName}`);
+        const userId = removeButton.dataset.userId;
+        const userName = removeButton.dataset.userName;
+
+        try {
+          await apiFetch(`/api/users/${userId}`, { method: "DELETE" });
+          await loadUsers();
+          showToast(`تم حذف المستخدم ${userName}`);
+        } catch (error) {
+          showToast(error.message);
+        }
       });
 
       document.querySelectorAll("[data-template-tab]").forEach((button) => {
@@ -1911,6 +2127,49 @@
 
       document.getElementById("activity-form").addEventListener("submit", async (event) => {
         event.preventDefault();
+        const title = document.getElementById("act-title").value.trim();
+        const axis = document.getElementById("act-axis").value.trim();
+        const activityDate = document.getElementById("act-date").value;
+
+        if (!title || !axis) {
+          showToast("اسم البرنامج والمحور مطلوبان");
+          return;
+        }
+
+        const payload = {
+          title,
+          axis,
+          activityDate,
+          data: {
+            target: document.getElementById("act-target").value.trim(),
+            responsible: document.getElementById("act-responsible").value.trim(),
+            count: document.getElementById("act-count").value,
+            partners: document.getElementById("act-partners").value.trim(),
+            budget: document.getElementById("act-budget").value.trim(),
+            generalGoal: document.getElementById("act-general-goal").value.trim(),
+            objectives: document.getElementById("act-objectives").value.trim(),
+            from: document.getElementById("act-from").value,
+            to: document.getElementById("act-to").value,
+            output: document.getElementById("act-output").value.trim(),
+            description: document.getElementById("act-description").value.trim(),
+            strengths: document.getElementById("act-strengths").value.trim(),
+            weaknesses: document.getElementById("act-weaknesses").value.trim(),
+            improvements: document.getElementById("act-improvements").value.trim(),
+            videoUrl: document.getElementById("act-video").value.trim(),
+          },
+        };
+
+        try {
+          await apiFetch("/api/reports/activity", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          await loadReports();
+        } catch (error) {
+          showToast(error.message);
+          return;
+        }
+
         const value = (id, fallback = "—") => {
           const text = document.getElementById(id).value.trim();
           return escapeHtml(text || fallback);
@@ -1919,9 +2178,11 @@
           [1, 2, 3, 4].map((number) => fileToDataUrl(document.getElementById(`act-image-${number}`).files[0])),
         );
         const photos = images
-          .map((src) => src
-            ? `<img src="${src}" alt="صورة النشاط" />`
-            : "<span>صورة النشاط</span>")
+          .map((src) => `
+            <div class="photo-box">
+              ${src ? `<img src="${src}" alt="صورة النشاط" />` : "<span>صورة النشاط</span>"}
+            </div>
+          `)
           .join("");
 
         document.getElementById("print-report").innerHTML = `
@@ -1976,13 +2237,44 @@
         window.print();
       });
 
-      document.getElementById("meeting-form").addEventListener("submit", (event) => {
+      document.getElementById("meeting-form").addEventListener("submit", async (event) => {
         event.preventDefault();
+        const meetingDate = document.getElementById("meeting-date").value;
+        const agenda = document.getElementById("meeting-agenda").value.trim();
+
+        if (!agenda || !meetingDate) {
+          showToast("التاريخ والتوصيات مطلوبة");
+          return;
+        }
+
+        const payload = {
+          meetingDate,
+          data: {
+            day: document.getElementById("meeting-day").value.trim(),
+            location: document.getElementById("meeting-location").value.trim(),
+            start: document.getElementById("meeting-start").value,
+            end: document.getElementById("meeting-end").value,
+            chair: document.getElementById("meeting-chair").value.trim(),
+            attendees: document.getElementById("meeting-attendees").value.trim(),
+            agenda,
+          },
+        };
+
+        try {
+          await apiFetch("/api/reports/meeting", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          await loadReports();
+        } catch (error) {
+          showToast(error.message);
+          return;
+        }
+
         const value = (id, fallback = "—") => {
           const text = document.getElementById(id).value.trim();
           return escapeHtml(text || fallback);
         };
-        const agenda = document.getElementById("meeting-agenda").value;
 
         document.getElementById("print-report").innerHTML = `
           <div class="official-page meeting-print">
@@ -2026,6 +2318,7 @@
       document.getElementById("act-date").value = today.toISOString().slice(0, 10);
       document.getElementById("meeting-date").value = today.toISOString().slice(0, 10);
       document.getElementById("meeting-day").value = new Intl.DateTimeFormat("ar-BH", { weekday: "long" }).format(today);
+      loadSession();
     </script>
   </body>
 </html>
