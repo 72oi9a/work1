@@ -7,6 +7,8 @@ const { Pool } = require("pg");
 const scrypt = promisify(crypto.scrypt);
 const app = express();
 const port = Number(process.env.PORT || 5000);
+
+// إعداد اتصال قاعدة البيانات مع دعم SSL للإنتاج
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
@@ -15,9 +17,14 @@ const pool = new Pool({
 const PAGE_KEYS = ["dashboard", "official-forms", "members", "supervisors", "reports"];
 const SESSION_COOKIE = "scout_session";
 
+// Middlewares الأساسية
 app.use(express.json({ limit: "8mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 app.use(express.static(path.join(__dirname)));
+
+// ==========================================
+// 1. الدوارل المساعدة والتشفير (Helper Functions)
+// ==========================================
 
 function hashSessionToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
@@ -44,7 +51,7 @@ function parseCookies(request) {
       .split(";")
       .map((part) => part.trim().split("="))
       .filter(([key, value]) => key && value)
-      .map(([key, ...value]) => [key, decodeURIComponent(value.join("="))]),
+      .map(([key, ...value]) => [key, decodeURIComponent(value.join("="))])
   );
 }
 
@@ -52,21 +59,29 @@ function setSessionCookie(response, token) {
   const secure = process.env.NODE_ENV === "production" ? " Secure;" : "";
   response.setHeader(
     "Set-Cookie",
-    `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800;${secure}`,
+    `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800;${secure}`
   );
 }
 
 function clearSessionCookie(response) {
-  response.setHeader("Set-Cookie", `${SESSION_COOKIE}=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax`);
+  response.setHeader(
+    "Set-Cookie",
+    `${SESSION_COOKIE}=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax`
+  );
 }
 
 function sendError(response, status, message) {
   return response.status(status).json({ error: message });
 }
 
+// ==========================================
+// 2. التحقق من الهوية والصلاحيات (Auth & RBAC)
+// ==========================================
+
 async function getCurrentUser(request) {
   const token = parseCookies(request)[SESSION_COOKIE];
   if (!token) return null;
+
   const result = await pool.query(
     `SELECT u.id, u.username, u.full_name, u.role, u.active,
             COALESCE(
@@ -88,8 +103,9 @@ async function getCurrentUser(request) {
         AND s.expires_at > NOW()
         AND u.active = TRUE
       GROUP BY u.id`,
-    [hashSessionToken(token)],
+    [hashSessionToken(token)]
   );
+
   return result.rows[0] || null;
 }
 
@@ -123,21 +139,22 @@ async function createSession(userId) {
   await pool.query(
     `INSERT INTO sessions (user_id, token_hash, expires_at)
      VALUES ($1, $2, NOW() + INTERVAL '7 days')`,
-    [userId, hashSessionToken(token)],
+    [userId, hashSessionToken(token)]
   );
   return token;
 }
 
 async function seedPermissions(userId, role) {
-  const permissions = role === "قائد الفرقة"
-    ? PAGE_KEYS.map((pageKey) => [pageKey, true, true, true, true])
-    : [
-        ["dashboard", true, false, false, false],
-        ["official-forms", true, true, false, false],
-        ["members", true, true, true, false],
-        ["supervisors", false, false, false, false],
-        ["reports", true, true, false, false],
-      ];
+  const permissions =
+    role === "قائد الفرقة"
+      ? PAGE_KEYS.map((pageKey) => [pageKey, true, true, true, true])
+      : [
+          ["dashboard", true, false, false, false],
+          ["official-forms", true, true, false, false],
+          ["members", true, true, true, false],
+          ["supervisors", false, false, false, false],
+          ["reports", true, true, false, false],
+        ];
 
   for (const [pageKey, view, create, edit, remove] of permissions) {
     await pool.query(
@@ -148,7 +165,7 @@ async function seedPermissions(userId, role) {
                      can_create = EXCLUDED.can_create,
                      can_edit = EXCLUDED.can_edit,
                      can_delete = EXCLUDED.can_delete`,
-      [userId, pageKey, view, create, edit, remove],
+      [userId, pageKey, view, create, edit, remove]
     );
   }
 }
@@ -156,19 +173,25 @@ async function seedPermissions(userId, role) {
 async function seedUser(username, fullName, role, password) {
   const existing = await pool.query("SELECT id FROM users WHERE username = $1", [username]);
   let userId = existing.rows[0]?.id;
+
   if (!userId) {
     const passwordHash = await hashPassword(password);
     const inserted = await pool.query(
       `INSERT INTO users (username, full_name, role, password_hash)
        VALUES ($1, $2, $3, $4)
        RETURNING id`,
-      [username, fullName, role, passwordHash],
+      [username, fullName, role, passwordHash]
     );
     userId = inserted.rows[0].id;
   }
+
   await seedPermissions(userId, role);
   return userId;
 }
+
+// ==========================================
+// 3. إنزاع الجداول والبيانات الأولية (Database Init)
+// ==========================================
 
 async function ensureDatabase() {
   await pool.query(`
@@ -182,6 +205,7 @@ async function ensureDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
     CREATE TABLE IF NOT EXISTS page_permissions (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -192,6 +216,7 @@ async function ensureDatabase() {
       can_delete BOOLEAN NOT NULL DEFAULT FALSE,
       UNIQUE (user_id, page_key)
     );
+
     CREATE TABLE IF NOT EXISTS sessions (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -199,6 +224,7 @@ async function ensureDatabase() {
       expires_at TIMESTAMPTZ NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
     CREATE TABLE IF NOT EXISTS members (
       id SERIAL PRIMARY KEY,
       full_name TEXT NOT NULL,
@@ -219,6 +245,7 @@ async function ensureDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
     CREATE TABLE IF NOT EXISTS activity_reports (
       id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
@@ -228,6 +255,7 @@ async function ensureDatabase() {
       created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
     CREATE TABLE IF NOT EXISTS meeting_minutes (
       id SERIAL PRIMARY KEY,
       meeting_date DATE,
@@ -236,6 +264,7 @@ async function ensureDatabase() {
       created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
     CREATE INDEX IF NOT EXISTS sessions_token_hash_idx ON sessions(token_hash);
     CREATE INDEX IF NOT EXISTS members_active_idx ON members(active);
     CREATE INDEX IF NOT EXISTS activity_reports_created_at_idx ON activity_reports(created_at DESC);
@@ -247,14 +276,14 @@ async function ensureDatabase() {
 
   const memberCount = await pool.query("SELECT COUNT(*)::int AS count FROM members");
   if (memberCount.rows[0].count === 0) {
-    await pool.query(
-      `INSERT INTO members
+    await pool.query(`
+      INSERT INTO members
         (full_name, scout_number, patrol, rank, join_date, phone, guardian_name, guardian_phone, email, address, notes)
-       VALUES
+      VALUES
         ('عبدالله محمد', 'SC-001', 'طليعة الصقر', 'كشاف متقدم', '2025-09-01', '39990001', 'محمد عبدالله', '39990002', 'abdullah@example.com', 'النعيم', 'ملتزم بالحضور'),
         ('يوسف علي', 'SC-002', 'طليعة النسر', 'كشاف متقدم', '2025-09-08', '39990003', 'علي يوسف', '39990004', 'yousef@example.com', 'المنامة', ''),
-        ('حسن أحمد', 'SC-003', 'طليعة الذئب', 'كشاف', '2026-01-10', '39990005', 'أحمد حسن', '39990006', 'hassan@example.com', 'مدينة حمد', 'يحتاج متابعة في الحضور')`,
-    );
+        ('حسن أحمد', 'SC-003', 'طليعة الذئب', 'كشاف', '2026-01-10', '39990005', 'أحمد حسن', '39990006', 'hassan@example.com', 'مدينة حمد', 'يحتاج متابعة في الحضور')
+    `);
   }
 
   const reportCount = await pool.query("SELECT COUNT(*)::int AS count FROM activity_reports");
@@ -262,25 +291,32 @@ async function ensureDatabase() {
     await pool.query(
       `INSERT INTO activity_reports (title, axis, activity_date, data, created_by)
        VALUES
-       ('رحلة الخلاء والتطبيق الخارجي', 'الكشفي والتربوي', '2026-09-10', '{"target":"كشافة فرقة المتقدم","count":24}'::jsonb, $1),
-       ('حملة تنظيف شاطئ النعيم', 'الخدمة المجتمعية', '2026-08-28', '{"target":"كشافة فرقة المتقدم","count":24}'::jsonb, $1)`,
-      [adminId],
+        ('رحلة الخلاء والتطبيق الخارجي', 'الكشفي والتربوي', '2026-09-10', '{"target":"كشافة فرقة المتقدم","count":24}'::jsonb, $1),
+        ('حملة تنظيف شاطئ النعيم', 'الخدمة المجتمعية', '2026-08-28', '{"target":"كشافة فرقة المتقدم","count":24}'::jsonb, $1)`,
+      [adminId]
     );
   }
 }
+
+// ==========================================
+// 4. مسارات المصادقة (Auth Endpoints)
+// ==========================================
 
 app.post("/api/auth/login", async (request, response, next) => {
   try {
     const { username, password } = request.body || {};
     if (!username || !password) return sendError(response, 400, "أدخل اسم المستخدم وكلمة المرور");
+
     const result = await pool.query(
       "SELECT id, username, full_name, role, active, password_hash FROM users WHERE username = $1",
-      [String(username).trim()],
+      [String(username).trim()]
     );
     const user = result.rows[0];
+
     if (!user || !user.active || !(await verifyPassword(password, user.password_hash))) {
       return sendError(response, 401, "بيانات الدخول غير صحيحة");
     }
+
     const token = await createSession(user.id);
     setSessionCookie(response, token);
     const currentUser = await getCurrentUser({ headers: { cookie: `${SESSION_COOKIE}=${token}` } });
@@ -305,6 +341,10 @@ app.get("/api/auth/me", requireAuth, (request, response) => {
   response.json({ user: request.user });
 });
 
+// ==========================================
+// 5. مسارات النواحي والإدارة (API Routes)
+// ==========================================
+
 app.get("/api/dashboard", requireAuth, requirePermission("dashboard"), async (request, response, next) => {
   try {
     const [members, reports, patrols, attendance, latestReports] = await Promise.all([
@@ -316,9 +356,10 @@ app.get("/api/dashboard", requireAuth, requirePermission("dashboard"), async (re
         `SELECT id, title, axis, activity_date, created_at
            FROM activity_reports
           ORDER BY activity_date DESC NULLS LAST, created_at DESC
-          LIMIT 10`,
+          LIMIT 10`
       ),
     ]);
+
     response.json({
       stats: {
         members: members.rows[0].count,
@@ -333,6 +374,7 @@ app.get("/api/dashboard", requireAuth, requirePermission("dashboard"), async (re
   }
 });
 
+// إدارة المستخدمين والمشرفين
 app.get("/api/users", requireAuth, requirePermission("supervisors"), async (request, response, next) => {
   try {
     const result = await pool.query(
@@ -343,7 +385,7 @@ app.get("/api/users", requireAuth, requirePermission("supervisors"), async (requ
          FROM users u
          LEFT JOIN page_permissions p ON p.user_id = u.id
         GROUP BY u.id
-        ORDER BY u.created_at`,
+        ORDER BY u.created_at`
     );
     response.json({ users: result.rows });
   } catch (error) {
@@ -357,13 +399,15 @@ app.post("/api/users", requireAuth, requirePermission("supervisors", "create"), 
     if (!username || !fullName || !role || !password || String(password).length < 6) {
       return sendError(response, 400, "أكمل بيانات المستخدم، وكلمة المرور يجب أن تكون 6 أحرف على الأقل");
     }
+
     const passwordHash = await hashPassword(String(password));
     const created = await pool.query(
       `INSERT INTO users (username, full_name, role, password_hash)
        VALUES ($1, $2, $3, $4)
        RETURNING id, username, full_name, role, active, created_at`,
-      [String(username).trim(), String(fullName).trim(), String(role).trim(), passwordHash],
+      [String(username).trim(), String(fullName).trim(), String(role).trim(), passwordHash]
     );
+
     await seedPermissions(created.rows[0].id, role);
     response.status(201).json({ user: created.rows[0] });
   } catch (error) {
@@ -383,8 +427,9 @@ app.patch("/api/users/:id", requireAuth, requirePermission("supervisors", "edit"
               updated_at = NOW()
         WHERE id = $4
         RETURNING id, username, full_name, role, active, created_at`,
-      [fullName || null, role || null, typeof active === "boolean" ? active : null, request.params.id],
+      [fullName || null, role || null, typeof active === "boolean" ? active : null, request.params.id]
     );
+
     if (!result.rows[0]) return sendError(response, 404, "المستخدم غير موجود");
     if (role) await seedPermissions(result.rows[0].id, role);
     response.json({ user: result.rows[0] });
@@ -400,7 +445,7 @@ app.get("/api/users/:id/permissions", requireAuth, requirePermission("supervisor
          FROM page_permissions
         WHERE user_id = $1
         ORDER BY page_key`,
-      [request.params.id],
+      [request.params.id]
     );
     response.json({ permissions: result.rows });
   } catch (error) {
@@ -412,6 +457,7 @@ app.put("/api/users/:id/permissions", requireAuth, requirePermission("supervisor
   try {
     const permissions = Array.isArray(request.body?.permissions) ? request.body.permissions : [];
     await pool.query("DELETE FROM page_permissions WHERE user_id = $1", [request.params.id]);
+
     for (const pageKey of PAGE_KEYS) {
       const item = permissions.find((permission) => permission.pageKey === pageKey) || {};
       await pool.query(
@@ -424,7 +470,7 @@ app.put("/api/users/:id/permissions", requireAuth, requirePermission("supervisor
           Boolean(item.create),
           Boolean(item.edit),
           Boolean(item.delete),
-        ],
+        ]
       );
     }
     response.json({ ok: true });
@@ -435,7 +481,9 @@ app.put("/api/users/:id/permissions", requireAuth, requirePermission("supervisor
 
 app.delete("/api/users/:id", requireAuth, requirePermission("supervisors", "delete"), async (request, response, next) => {
   try {
-    if (String(request.params.id) === String(request.user.id)) return sendError(response, 400, "لا يمكنك حذف حسابك الحالي");
+    if (String(request.params.id) === String(request.user.id)) {
+      return sendError(response, 400, "لا يمكنك حذف حسابك الحالي");
+    }
     const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING id", [request.params.id]);
     if (!result.rows[0]) return sendError(response, 404, "المستخدم غير موجود");
     response.json({ ok: true });
@@ -444,6 +492,7 @@ app.delete("/api/users/:id", requireAuth, requirePermission("supervisors", "dele
   }
 });
 
+// إدارة الأعضاء
 app.get("/api/members", requireAuth, requirePermission("members"), async (request, response, next) => {
   try {
     const result = await pool.query("SELECT * FROM members ORDER BY active DESC, full_name");
@@ -457,6 +506,7 @@ app.post("/api/members", requireAuth, requirePermission("members", "create"), as
   try {
     const member = request.body || {};
     if (!member.fullName?.trim()) return sendError(response, 400, "الاسم الكامل مطلوب");
+
     const result = await pool.query(
       `INSERT INTO members
         (full_name, scout_number, national_id, birth_date, phone, guardian_name, guardian_phone,
@@ -464,11 +514,21 @@ app.post("/api/members", requireAuth, requirePermission("members", "create"), as
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
-        member.fullName.trim(), member.scoutNumber || null, member.nationalId || null, member.birthDate || null,
-        member.phone || null, member.guardianName || null, member.guardianPhone || null, member.email || null,
-        member.patrol || null, member.rank || null, member.joinDate || null, member.address || null,
-        member.medicalNotes || null, member.notes || null,
-      ],
+        member.fullName.trim(),
+        member.scoutNumber || null,
+        member.nationalId || null,
+        member.birthDate || null,
+        member.phone || null,
+        member.guardianName || null,
+        member.guardianPhone || null,
+        member.email || null,
+        member.patrol || null,
+        member.rank || null,
+        member.joinDate || null,
+        member.address || null,
+        member.medicalNotes || null,
+        member.notes || null,
+      ]
     );
     response.status(201).json({ member: result.rows[0] });
   } catch (error) {
@@ -491,13 +551,25 @@ app.patch("/api/members/:id", requireAuth, requirePermission("members", "edit"),
         notes = COALESCE($14, notes), active = COALESCE($15, active), updated_at = NOW()
        WHERE id = $16 RETURNING *`,
       [
-        member.fullName || null, member.scoutNumber || null, member.nationalId || null, member.birthDate || null,
-        member.phone || null, member.guardianName || null, member.guardianPhone || null, member.email || null,
-        member.patrol || null, member.rank || null, member.joinDate || null, member.address || null,
-        member.medicalNotes || null, member.notes || null, typeof member.active === "boolean" ? member.active : null,
+        member.fullName || null,
+        member.scoutNumber || null,
+        member.nationalId || null,
+        member.birthDate || null,
+        member.phone || null,
+        member.guardianName || null,
+        member.guardianPhone || null,
+        member.email || null,
+        member.patrol || null,
+        member.rank || null,
+        member.joinDate || null,
+        member.address || null,
+        member.medicalNotes || null,
+        member.notes || null,
+        typeof member.active === "boolean" ? member.active : null,
         request.params.id,
-      ],
+      ]
     );
+
     if (!result.rows[0]) return sendError(response, 404, "العضو غير موجود");
     response.json({ member: result.rows[0] });
   } catch (error) {
@@ -515,15 +587,17 @@ app.delete("/api/members/:id", requireAuth, requirePermission("members", "delete
   }
 });
 
+// إدارة التقارير
 app.post("/api/reports/activity", requireAuth, requirePermission("reports", "create"), async (request, response, next) => {
   try {
     const { title, axis, activityDate, data } = request.body || {};
     if (!title || !axis) return sendError(response, 400, "اسم البرنامج والمحور مطلوبان");
+
     const result = await pool.query(
       `INSERT INTO activity_reports (title, axis, activity_date, data, created_by)
        VALUES ($1, $2, $3, $4::jsonb, $5)
        RETURNING id, title, axis, activity_date, created_at`,
-      [title, axis, activityDate || null, JSON.stringify(data || {}), request.user.id],
+      [title, axis, activityDate || null, JSON.stringify(data || {}), request.user.id]
     );
     response.status(201).json({ report: result.rows[0] });
   } catch (error) {
@@ -538,7 +612,7 @@ app.post("/api/reports/meeting", requireAuth, requirePermission("reports", "crea
       `INSERT INTO meeting_minutes (meeting_date, data, created_by)
        VALUES ($1, $2::jsonb, $3)
        RETURNING id, title, meeting_date, created_at`,
-      [meetingDate || null, JSON.stringify(data || {}), request.user.id],
+      [meetingDate || null, JSON.stringify(data || {}), request.user.id]
     );
     response.status(201).json({ report: result.rows[0] });
   } catch (error) {
@@ -546,9 +620,9 @@ app.post("/api/reports/meeting", requireAuth, requirePermission("reports", "crea
   }
 });
 
-app.use("/api", (error, request, response, next) => {
-  next(error);
-});
+// ==========================================
+// 6. معالجة الأخطاء والتشغيل (Error Handling & Launch)
+// ==========================================
 
 app.use((error, request, response, next) => {
   console.error(error);
