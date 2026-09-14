@@ -2292,6 +2292,17 @@
         return qrTarget.querySelector("img")?.src || "";
       }
 
+      async function waitForPrintAssets() {
+        const images = [...document.querySelectorAll("#print-report img")];
+        await Promise.all(images.map((image) => {
+          if (image.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            image.addEventListener("load", resolve, { once: true });
+            image.addEventListener("error", resolve, { once: true });
+          });
+        }));
+      }
+
       function linesAsList(value, emptyText) {
         const lines = String(value || "")
           .split(/\n+/)
@@ -2419,6 +2430,7 @@
           </div>
         `;
         showToast("تم تجهيز التقرير، اختر الطباعة ثم حفظ بصيغة PDF");
+        await waitForPrintAssets();
         window.print();
       });
 
@@ -2494,6 +2506,7 @@
           </div>
         `;
         showToast("تم تجهيز محضر الاجتماع، اختر الطباعة ثم حفظ بصيغة PDF");
+        await waitForPrintAssets();
         window.print();
       });
 
