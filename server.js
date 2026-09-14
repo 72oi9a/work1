@@ -281,9 +281,18 @@ async function ensureDatabase() {
     CREATE INDEX IF NOT EXISTS activity_reports_created_at_idx ON activity_reports(created_at DESC);
   `);
 
-  const adminId = await seedUser("al-naaim_scout", "قائد الفرقة", "قائد الفرقة", "scout2026");
-  await seedUser("mohammed@scouts.bh", "محمد علي", "مشرف عام", "scout2026");
-  await seedUser("salman@scouts.bh", "سلمان حسن", "قائد طليعة", "scout2026");
+  const userCount = await pool.query("SELECT COUNT(*)::int AS count FROM users");
+  let adminId = (await pool.query(
+    "SELECT id FROM users WHERE username = $1 LIMIT 1",
+    ["al-naaim_scout"]
+  )).rows[0]?.id;
+
+  // Seed demo accounts only during the first database initialization.
+  if (userCount.rows[0].count === 0) {
+    adminId = await seedUser("al-naaim_scout", "قائد الفرقة", "قائد الفرقة", "scout2026");
+    await seedUser("mohammed@scouts.bh", "محمد علي", "مشرف عام", "scout2026");
+    await seedUser("salman@scouts.bh", "سلمان حسن", "قائد طليعة", "scout2026");
+  }
 
   const memberCount = await pool.query("SELECT COUNT(*)::int AS count FROM members");
   if (memberCount.rows[0].count === 0) {
