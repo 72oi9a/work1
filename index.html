@@ -1286,9 +1286,9 @@
               <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
               <span>النماذج الرسمية</span>
             </button>
-            <button class="nav-button" data-view="scouts" type="button">
+            <button class="nav-button" data-view="members" type="button">
               <i class="fa-solid fa-users" aria-hidden="true"></i>
-              <span>سجل الكشافة والطلائع</span>
+              <span>أعضاء الفرقة</span>
             </button>
             <button class="nav-button" data-view="supervisors" type="button">
               <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
@@ -1325,19 +1325,19 @@
           <div class="stats-grid" aria-label="إحصائيات الفرقة">
             <article class="card stat-card">
               <p class="stat-label">إجمالي الكشافة</p>
-              <p class="stat-value">24 <span class="stat-unit">كشاف</span></p>
+              <p id="stat-members" class="stat-value">0 <span class="stat-unit">عضو</span></p>
             </article>
             <article class="card stat-card">
               <p class="stat-label">التقارير الموثقة</p>
-              <p class="stat-value khaki">12 <span class="stat-unit">تقرير</span></p>
+              <p id="stat-reports" class="stat-value khaki">0 <span class="stat-unit">تقرير</span></p>
             </article>
             <article class="card stat-card">
               <p class="stat-label">عدد الطلائع</p>
-              <p class="stat-value">3 <span class="stat-unit">طلائع</span></p>
+              <p id="stat-patrols" class="stat-value">0 <span class="stat-unit">طلائع</span></p>
             </article>
             <article class="card stat-card">
               <p class="stat-label">نسبة الحضور العامة</p>
-              <p class="stat-value success">92%</p>
+              <p id="stat-attendance" class="stat-value success">0%</p>
             </article>
           </div>
 
@@ -1360,7 +1360,7 @@
                 <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
                 أحدث التقارير الكشفية الموثقة
               </h3>
-              <p class="section-note">آخر تحديث: اليوم</p>
+                <p id="dashboard-updated" class="section-note">جاري التحميل...</p>
             </div>
             <div class="table-wrap">
               <table>
@@ -1372,27 +1372,8 @@
                     <th>الإجراء</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td class="event-name">رحلة الخلاء والتطبيق الخارجي</td>
-                    <td class="axis">الكشفي والتربوي</td>
-                    <td class="date">2026-09-10</td>
-                    <td>
-                      <button class="download-button" data-report="رحلة الخلاء والتطبيق الخارجي" type="button">
-                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> عرض التقرير
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="event-name">حملة تنظيف شاطئ النعيم</td>
-                    <td class="axis">الخدمة المجتمعية</td>
-                    <td class="date">2026-08-28</td>
-                    <td>
-                      <button class="download-button" data-report="حملة تنظيف شاطئ النعيم" type="button">
-                        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> عرض التقرير
-                      </button>
-                    </td>
-                  </tr>
+                <tbody id="latest-reports-list">
+                  <tr><td colspan="4" class="section-note">جاري تحميل التقارير...</td></tr>
                 </tbody>
               </table>
             </div>
