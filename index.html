@@ -893,6 +893,11 @@
       }
 
       @media (max-width: 680px) {
+        html,
+        body {
+          overflow-x: hidden;
+        }
+
         .app-shell {
           display: block;
         }
@@ -905,20 +910,25 @@
         }
 
         .brand {
+          gap: 10px;
           margin-bottom: 15px;
           padding-bottom: 15px;
         }
 
         .nav {
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          display: flex;
           gap: 6px;
+          overflow-x: auto;
+          padding-bottom: 3px;
+          scrollbar-width: thin;
         }
 
         .nav-button {
+          flex: 0 0 76px;
           justify-content: center;
           gap: 7px;
           min-height: 44px;
-          padding: 9px 7px;
+          padding: 8px 6px;
           font-size: 10px;
           text-align: center;
         }
@@ -933,12 +943,18 @@
         }
 
         .main {
-          padding: 25px 16px 42px;
+          width: 100%;
+          padding: 22px 12px 36px;
         }
 
         .page-heading {
           align-items: stretch;
           flex-direction: column;
+          gap: 14px;
+        }
+
+        .page-title {
+          font-size: 23px;
         }
 
         .page-heading .primary-button {
@@ -947,7 +963,25 @@
 
         .section-card,
         .report-form {
-          padding: 17px;
+          padding: 14px;
+        }
+
+        .section-heading {
+          align-items: flex-start;
+          flex-wrap: wrap;
+        }
+
+        .stats-grid {
+          gap: 8px;
+        }
+
+        .stat-card {
+          min-height: 105px;
+          padding: 13px;
+        }
+
+        .stat-value {
+          font-size: 23px;
         }
 
         .file-grid {
@@ -968,9 +1002,63 @@
           width: 100%;
         }
 
+        .form-actions,
+        .qr-row {
+          flex-direction: column;
+        }
+
+        .form-actions .primary-button,
+        .form-actions .danger-button,
+        .qr-row .qr-preview {
+          width: 100%;
+        }
+
+        .table-wrap {
+          margin-inline: -2px;
+        }
+
         .toast {
           right: 16px;
+          left: 16px;
+          max-width: none;
           bottom: 16px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .sidebar {
+          padding: 13px 10px;
+        }
+
+        .brand-title {
+          font-size: 15px;
+        }
+
+        .brand-subtitle {
+          font-size: 9px;
+        }
+
+        .brand-mark {
+          width: 40px;
+          height: 40px;
+        }
+
+        .file-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .template-tabs {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        .template-tab {
+          justify-content: center;
+          width: 100%;
+        }
+
+        .login-card {
+          padding: 20px 16px;
         }
       }
 
