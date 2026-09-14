@@ -1281,104 +1281,135 @@
           height: 31mm;
         }
 
-        .meeting-info-table td,
-        .meeting-info-table th {
-          min-height: 0;
-          padding: 0 2mm;
-          color: #111;
-          background: transparent;
-          border: 0;
-          font-size: 12px;
+        .meeting-print::before,
+        .meeting-print::after {
+          display: none;
         }
 
         .meeting-print .official-header {
-          min-height: 38mm;
-          padding-top: 5mm;
-          padding-bottom: 4mm;
+          display: grid;
+          grid-template-columns: 32mm minmax(0, 1fr) 28mm;
+          align-items: center;
+          gap: 4mm;
+          min-height: 30mm;
+          padding: 3mm 0 1mm;
+          direction: ltr;
+          border-bottom: 0;
         }
 
-        .meeting-print .official-header img {
-          width: 38mm;
-          height: 38mm;
+        .meeting-print .meeting-scout-logo,
+        .meeting-print .meeting-school-logo {
+          width: 100%;
+          height: auto;
+          max-height: 27mm;
+          object-fit: contain;
+        }
+
+        .meeting-print .meeting-ministry-logo {
+          width: 100%;
+          height: auto;
+          max-height: 27mm;
+          object-fit: contain;
         }
 
         .meeting-print h1 {
-          margin: 8mm 0 10mm;
+          margin: 8mm 0 12mm;
           font-size: 22px;
+          font-weight: 500;
+        }
+
+        .meeting-print {
+          padding: 5mm 14mm 13mm;
         }
 
         .meeting-info-table {
-          border-collapse: separate;
-          border-spacing: 0 6mm;
-          font-size: 12px;
-        }
-
-        .meeting-info-table th {
-          width: 14%;
-          color: #adadad;
-          font-weight: 700;
-          text-align: right;
+          width: 82%;
+          margin: 0 auto 11mm;
+          border-collapse: collapse;
+          table-layout: fixed;
+          font-size: 13px;
+          direction: rtl;
         }
 
         .meeting-info-table td {
-          width: 36%;
-          text-align: center;
-          word-break: normal;
+          width: 50%;
+          height: 8mm;
+          padding: 1.5mm 3mm;
+          color: #111;
+          background: #fff;
+          border: 1px solid #111;
+          text-align: right;
+          white-space: nowrap;
         }
 
-        .meeting-info-table tr:last-child th,
         .meeting-info-table tr:last-child td {
-          padding-top: 1mm;
+          text-align: center;
+        }
+
+        .meeting-info-table strong {
+          font-weight: 500;
         }
 
         .attendance-box {
-          width: 64%;
-          margin: 8mm auto 16mm;
-          border: 1px solid #aaa;
+          width: 55%;
+          margin: 0 auto 23mm;
+          border: 1px solid #b8b8b8;
         }
 
         .attendance-box h3 {
           margin: 0;
-          padding: 4mm;
+          padding: 2mm;
           font-size: 14px;
+          font-weight: 700;
           text-align: center;
-          border-bottom: 1px solid #aaa;
+          border-bottom: 1px solid #b8b8b8;
         }
 
-        .attendance-box p {
-          min-height: 19mm;
-          margin: 0;
-          padding: 5mm 8mm;
+        .attendance-names {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          min-height: 10mm;
+          direction: rtl;
+        }
+
+        .attendance-names span {
+          padding: 2mm 3mm;
           color: #111;
+          font-size: 13px;
+          font-weight: 700;
           text-align: center;
-          white-space: pre-line;
+          border-left: 1px solid #b8b8b8;
+        }
+
+        .attendance-names span:last-child {
+          border-left: 0;
         }
 
         .meeting-intro {
-          margin: 0 0 6mm;
+          margin: 0 0 5mm;
           font-size: 14px;
           font-weight: 700;
+          text-align: center;
         }
 
         .meeting-recommendations {
-          margin: 0;
-          padding-right: 7mm;
+          display: grid;
+          gap: 2mm;
+          margin: 0 auto;
+          width: 88%;
           color: #111;
           font-size: 13px;
-          line-height: 2;
-          white-space: pre-line;
+          font-weight: 700;
+          line-height: 1.8;
+          text-align: center;
         }
 
-        .meeting-recommendations li {
-          padding-right: 2mm;
+        .meeting-recommendations p {
+          margin: 0;
         }
 
         .meeting-signature {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 19mm;
-          color: #333;
-          font-size: 12px;
+          display: none;
         }
 
       }
@@ -2270,6 +2301,15 @@
         return lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
       }
 
+      function linesAsParagraphs(value, emptyText) {
+        const lines = String(value || "")
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        if (!lines.length) return `<p>${escapeHtml(emptyText)}</p>`;
+        return lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+      }
+
       document.getElementById("activity-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         const title = document.getElementById("act-title").value.trim();
@@ -2420,29 +2460,33 @@
           const text = document.getElementById(id).value.trim();
           return escapeHtml(text || fallback);
         };
+        const attendees = document.getElementById("meeting-attendees").value;
+        const attendeeNames = attendees
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => `<span>${escapeHtml(line)}</span>`)
+          .join("") || "<span>لا يوجد حضور مسجل</span>";
 
         document.getElementById("print-report").innerHTML = `
           <div class="official-page meeting-print">
             <div class="official-header">
-              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
-              <div class="official-header-center">
-                <strong>مملكة البحرين</strong>
-                <span>وزارة التربية والتعليم<br />فرقة متقدم النعيم الكشفية</span>
-              </div>
-              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+              <img class="meeting-scout-logo" src="/attached_assets/meeting-header-3.png" alt="شعار الكشافة" />
+              <img class="meeting-ministry-logo" src="/attached_assets/meeting-header-2.png" alt="شعار وزارة التربية والتعليم" />
+              <img class="meeting-school-logo" src="/attached_assets/meeting-header-1.png" alt="شعار المدرسة" />
             </div>
             <h1>تقرير اجتماع مجلس الشرف</h1>
             <table class="template-print-table meeting-info-table">
-              <tr><th>اليوم</th><td>${value("meeting-day")}</td><th>التاريخ</th><td>${formatDate(document.getElementById("meeting-date").value)}</td></tr>
-              <tr><th>البدء</th><td>${formatTime(document.getElementById("meeting-start").value)}</td><th>الانتهاء</th><td>${formatTime(document.getElementById("meeting-end").value)}</td></tr>
-              <tr><th>الموقع</th><td colspan="3">${value("meeting-location")}</td></tr>
+              <tr><td><strong>اليوم:</strong> ${value("meeting-day")}</td><td><strong>التاريخ:</strong> ${formatDate(document.getElementById("meeting-date").value)}</td></tr>
+              <tr><td><strong>البدء:</strong> ${formatTime(document.getElementById("meeting-start").value)}</td><td><strong>الانتهاء:</strong> ${formatTime(document.getElementById("meeting-end").value)}</td></tr>
+              <tr><td colspan="2"><strong>الموقع:</strong> ${value("meeting-location")}</td></tr>
             </table>
             <div class="attendance-box">
               <h3>الحضور</h3>
-              <p>${value("meeting-attendees")}</p>
+              <div class="attendance-names">${attendeeNames}</div>
             </div>
-            <p class="meeting-intro">انعقد الاجتماع وتم الخروج بالتفاصيل والتوصيات التالية:</p>
-            <ul class="meeting-recommendations">${linesAsList(agenda, "لم يتم إدخال تفاصيل أو توصيات.")}</ul>
+            <p class="meeting-intro">انعقد الاجتماع الأول للعرفاء وتم الخروج بالتفاصيل والتوصيات التالية:</p>
+            <div class="meeting-recommendations">${linesAsParagraphs(agenda, "لم يتم إدخال تفاصيل أو توصيات.")}</div>
             <div class="meeting-signature">
               <span>رئيس الاجتماع: ${value("meeting-chair")}</span>
               <span>التوقيع: __________________</span>
