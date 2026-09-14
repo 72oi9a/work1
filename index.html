@@ -1183,35 +1183,80 @@
 
         .meeting-info-table td,
         .meeting-info-table th {
-          min-height: 10mm;
+          min-height: 0;
+          padding: 0 2mm;
+          color: #111;
+          background: transparent;
+          border: 0;
+          font-size: 12px;
+        }
+
+        .meeting-print .official-header {
+          min-height: 38mm;
+          padding-top: 5mm;
+          padding-bottom: 4mm;
+        }
+
+        .meeting-print .official-header img {
+          width: 38mm;
+          height: 38mm;
+        }
+
+        .meeting-print h1 {
+          margin: 8mm 0 10mm;
+          font-size: 22px;
+        }
+
+        .meeting-info-table {
+          border-collapse: separate;
+          border-spacing: 0 6mm;
+          font-size: 12px;
+        }
+
+        .meeting-info-table th {
+          width: 14%;
+          color: #adadad;
+          font-weight: 700;
+          text-align: right;
+        }
+
+        .meeting-info-table td {
+          width: 36%;
+          text-align: center;
+          word-break: normal;
+        }
+
+        .meeting-info-table tr:last-child th,
+        .meeting-info-table tr:last-child td {
+          padding-top: 1mm;
         }
 
         .attendance-box {
-          width: 70%;
-          margin: 9mm auto;
+          width: 64%;
+          margin: 8mm auto 16mm;
           border: 1px solid #aaa;
         }
 
         .attendance-box h3 {
           margin: 0;
-          padding: 3mm;
-          font-size: 13px;
+          padding: 4mm;
+          font-size: 14px;
           text-align: center;
           border-bottom: 1px solid #aaa;
         }
 
         .attendance-box p {
-          min-height: 15mm;
+          min-height: 19mm;
           margin: 0;
-          padding: 4mm;
+          padding: 5mm 8mm;
           color: #111;
           text-align: center;
           white-space: pre-line;
         }
 
         .meeting-intro {
-          margin: 14mm 0 6mm;
-          font-size: 13px;
+          margin: 0 0 6mm;
+          font-size: 14px;
           font-weight: 700;
         }
 
@@ -1219,7 +1264,7 @@
           margin: 0;
           padding-right: 7mm;
           color: #111;
-          font-size: 12px;
+          font-size: 13px;
           line-height: 2;
           white-space: pre-line;
         }
@@ -1231,9 +1276,9 @@
         .meeting-signature {
           display: flex;
           justify-content: space-between;
-          margin-top: 18mm;
+          margin-top: 19mm;
           color: #333;
-          font-size: 11px;
+          font-size: 12px;
         }
 
       }
