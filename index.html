@@ -99,6 +99,7 @@
         background: #111;
         border: 1px solid var(--khaki);
         border-radius: 50%;
+        overflow: hidden;
         box-shadow: 0 0 0 5px rgba(200, 171, 131, 0.04);
       }
 
@@ -106,6 +107,13 @@
         width: 44px;
         height: 44px;
         font-size: 21px;
+      }
+
+      .brand-mark img,
+      .login-mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .brand-title {
@@ -581,6 +589,84 @@
         margin-bottom: 18px;
       }
 
+      .success {
+        color: var(--success);
+      }
+
+      .supervisor-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.6fr);
+        gap: 18px;
+      }
+
+      .add-user-card {
+        align-self: start;
+        padding: 22px;
+      }
+
+      .add-user-form {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .supervisor-table-card {
+        min-width: 0;
+        padding: 22px;
+      }
+
+      .supervisor-table {
+        min-width: 560px;
+      }
+
+      .supervisor-avatar {
+        display: inline-grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        margin-left: 8px;
+        color: var(--khaki);
+        background: #2a2118;
+        border: 1px solid #6d5437;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 800;
+        vertical-align: middle;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 8px;
+        color: #a7f3d0;
+        background: rgba(16, 88, 59, 0.28);
+        border: 1px solid rgba(52, 211, 153, 0.28);
+        border-radius: 999px;
+        font-size: 10px;
+      }
+
+      .status-pill::before {
+        width: 5px;
+        height: 5px;
+        background: var(--success);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .remove-user-button {
+        padding: 5px 8px;
+        color: #f87171;
+        background: transparent;
+        border: 0;
+        border-radius: 7px;
+        font-size: 11px;
+      }
+
+      .remove-user-button:hover {
+        background: rgba(127, 29, 29, 0.22);
+      }
+
       .summary-item {
         padding: 15px;
         border: 1px solid var(--line-soft);
@@ -759,7 +845,7 @@
         }
 
         .nav {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 6px;
         }
 
@@ -802,6 +888,10 @@
         .form-grid,
         .form-grid.three,
         .scout-summary {
+          grid-template-columns: 1fr;
+        }
+
+        .supervisor-layout {
           grid-template-columns: 1fr;
         }
 
@@ -876,19 +966,13 @@
   <body>
     <div id="login-modal" class="modal-backdrop">
       <section class="login-card" aria-labelledby="login-title">
-        <div class="login-mark" aria-hidden="true">⚜️</div>
+        <div class="login-mark" aria-hidden="true">
+          <img src="/attached_assets/image_1789389348245.png" alt="" />
+        </div>
         <h1 id="login-title" class="login-title">فرقة متقدم النعيم الكشفي</h1>
         <p class="login-subtitle">تسجيل الدخول للنظام الإداري</p>
 
         <form id="login-form" class="login-form">
-          <div class="field">
-            <label for="user-role">نوع المستخدم / الصلاحية</label>
-            <select id="user-role">
-              <option value="قائد الفرقة">قائد الفرقة (Admin)</option>
-              <option value="العريف الأول / عريف طليعة">العريف الأول / عريف طليعة (Sub-Admin)</option>
-              <option value="كشاف">كشاف (عضو - قراءة فقط)</option>
-            </select>
-          </div>
           <div class="field">
             <label for="username">اسم المستخدم أو البريد</label>
             <input id="username" type="text" value="al-naaim_scout" required autocomplete="username" />
@@ -908,7 +992,9 @@
       <aside class="sidebar">
         <div>
           <div class="brand">
-            <div class="brand-mark" aria-hidden="true">⚜️</div>
+            <div class="brand-mark" aria-hidden="true">
+              <img src="/attached_assets/image_1789389348245.png" alt="" />
+            </div>
             <div>
               <p class="brand-title">متقدم النعيم</p>
               <p class="brand-subtitle">منظومة التقارير والإدارة</p>
@@ -927,6 +1013,10 @@
             <button class="nav-button" data-view="scouts" type="button">
               <i class="fa-solid fa-users" aria-hidden="true"></i>
               <span>سجل الكشافة والطلائع</span>
+            </button>
+            <button class="nav-button" data-view="supervisors" type="button">
+              <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+              <span>المشرفون</span>
             </button>
           </nav>
         </div>
@@ -974,6 +1064,19 @@
               <p class="stat-value success">92%</p>
             </article>
           </div>
+
+          <section class="card section-card">
+            <div class="section-heading">
+              <h3 class="section-title">
+                <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+                قسم المشرفين
+              </h3>
+              <button class="ghost-button" data-go-view="supervisors" type="button">
+                إدارة المستخدمين <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="section-note">إدارة حسابات قادة الفرقة والمشرفين وصلاحيات الوصول إلى المنظومة.</p>
+          </section>
 
           <section class="card section-card">
             <div class="section-heading">
@@ -1138,6 +1241,103 @@
             </div>
           </section>
         </section>
+
+        <section id="view-supervisors" class="view" data-view-panel="supervisors" hidden>
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">إدارة الصلاحيات والوصول</p>
+              <h2 class="page-title">المشرفون والمستخدمون</h2>
+              <p class="page-description">أضف حسابات المشرفين وحدد صلاحياتهم داخل منظومة الفرقة.</p>
+            </div>
+          </header>
+
+          <div class="supervisor-layout">
+            <section class="card add-user-card">
+              <h3 class="section-title">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                إضافة مستخدم جديد
+              </h3>
+              <p class="section-note">سيتم تفعيل الحساب مباشرة بعد إضافته.</p>
+
+              <form id="add-user-form" class="add-user-form">
+                <div class="field">
+                  <label for="new-user-name">اسم المستخدم أو البريد *</label>
+                  <input id="new-user-name" type="text" required placeholder="مثال: supervisor@scouts.bh" />
+                </div>
+                <div class="field">
+                  <label for="new-user-full-name">الاسم الكامل *</label>
+                  <input id="new-user-full-name" type="text" required placeholder="مثال: محمد أحمد" />
+                </div>
+                <div class="field">
+                  <label for="new-user-role">الصلاحية *</label>
+                  <select id="new-user-role" required>
+                    <option value="مشرف عام">مشرف عام</option>
+                    <option value="قائد طليعة">قائد طليعة</option>
+                    <option value="مدخل بيانات">مدخل بيانات</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="new-user-password">كلمة المرور المؤقتة *</label>
+                  <input id="new-user-password" type="password" required minlength="6" placeholder="6 أحرف على الأقل" autocomplete="new-password" />
+                </div>
+                <button class="primary-button" type="submit">
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                  إضافة المستخدم
+                </button>
+              </form>
+            </section>
+
+            <section class="card supervisor-table-card">
+              <div class="section-heading">
+                <h3 class="section-title">
+                  <i class="fa-solid fa-users-gear" aria-hidden="true"></i>
+                  المستخدمون المسجلون
+                </h3>
+                <p id="supervisor-count" class="section-note">3 مستخدمين</p>
+              </div>
+              <div class="table-wrap">
+                <table class="supervisor-table">
+                  <thead>
+                    <tr>
+                      <th>المستخدم</th>
+                      <th>الصلاحية</th>
+                      <th>الحالة</th>
+                      <th>الإجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody id="supervisors-list">
+                    <tr>
+                      <td class="event-name"><span class="supervisor-avatar">ق</span>قائد الفرقة</td>
+                      <td class="axis">قائد الفرقة</td>
+                      <td><span class="status-pill">نشط</span></td>
+                      <td><span class="section-note">الحساب الأساسي</span></td>
+                    </tr>
+                    <tr>
+                      <td class="event-name"><span class="supervisor-avatar">م</span>محمد علي</td>
+                      <td class="axis">مشرف عام</td>
+                      <td><span class="status-pill">نشط</span></td>
+                      <td>
+                        <button class="remove-user-button" type="button" data-remove-user="محمد علي">
+                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i> حذف
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="event-name"><span class="supervisor-avatar">س</span>سلمان حسن</td>
+                      <td class="axis">قائد طليعة</td>
+                      <td><span class="status-pill">نشط</span></td>
+                      <td>
+                        <button class="remove-user-button" type="button" data-remove-user="سلمان حسن">
+                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i> حذف
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -1181,13 +1381,67 @@
 
       document.getElementById("login-form").addEventListener("submit", (event) => {
         event.preventDefault();
-        loggedUserRole.textContent = document.getElementById("user-role").value;
+        loggedUserRole.textContent = "قائد الفرقة";
         loginModal.hidden = true;
         showToast("تم تسجيل الدخول إلى منظومة الفرقة بنجاح");
       });
 
       document.getElementById("logout-button").addEventListener("click", () => {
         loginModal.hidden = false;
+      });
+
+      const supervisorsList = document.getElementById("supervisors-list");
+      const supervisorCount = document.getElementById("supervisor-count");
+
+      function updateSupervisorCount() {
+        const count = supervisorsList.querySelectorAll("tr").length;
+        supervisorCount.textContent = `${count} مستخدمين`;
+      }
+
+      function initials(name) {
+        return name.trim().charAt(0) || "م";
+      }
+
+      document.getElementById("add-user-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = document.getElementById("new-user-name").value.trim();
+        const fullName = document.getElementById("new-user-full-name").value.trim();
+        const role = document.getElementById("new-user-role").value;
+        const row = document.createElement("tr");
+
+        const userCell = document.createElement("td");
+        userCell.className = "event-name";
+        userCell.innerHTML = `<span class="supervisor-avatar">${initials(fullName)}</span>${fullName}<small style="display:block;color:#71717a;font-size:10px;margin-top:3px">${username}</small>`;
+
+        const roleCell = document.createElement("td");
+        roleCell.className = "axis";
+        roleCell.textContent = role;
+
+        const statusCell = document.createElement("td");
+        statusCell.innerHTML = '<span class="status-pill">نشط</span>';
+
+        const actionCell = document.createElement("td");
+        const removeButton = document.createElement("button");
+        removeButton.className = "remove-user-button";
+        removeButton.type = "button";
+        removeButton.dataset.removeUser = fullName;
+        removeButton.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i> حذف';
+        actionCell.append(removeButton);
+
+        row.append(userCell, roleCell, statusCell, actionCell);
+        supervisorsList.append(row);
+        updateSupervisorCount();
+        event.target.reset();
+        showToast(`تمت إضافة المستخدم ${fullName} بنجاح`);
+      });
+
+      supervisorsList.addEventListener("click", (event) => {
+        const removeButton = event.target.closest("[data-remove-user]");
+        if (!removeButton) return;
+        const userName = removeButton.dataset.removeUser;
+        removeButton.closest("tr").remove();
+        updateSupervisorCount();
+        showToast(`تم حذف المستخدم ${userName}`);
       });
 
       const qrContainer = document.getElementById("qr-preview-container");
