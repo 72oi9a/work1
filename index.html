@@ -463,6 +463,71 @@
         padding: 25px;
       }
 
+      .template-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 5px;
+        background: #11100e;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .template-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 0 15px;
+        color: #9a9a9f;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .template-tab i {
+        color: var(--khaki);
+      }
+
+      .template-tab:hover,
+      .template-tab.active {
+        color: #fff;
+        background: var(--brown);
+        border-color: rgba(200, 171, 131, 0.45);
+      }
+
+      .template-panel[hidden] {
+        display: none;
+      }
+
+      .file-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .file-field {
+        display: grid;
+        gap: 7px;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.14);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+      }
+
+      .file-field label {
+        color: #a1a1aa;
+        font-size: 10px;
+      }
+
+      .file-field input {
+        width: 100%;
+        color: #9a9a9f;
+        font-size: 10px;
+      }
+
       .form-section {
         display: grid;
         gap: 14px;
@@ -885,6 +950,10 @@
           padding: 17px;
         }
 
+        .file-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .form-grid,
         .form-grid.three,
         .scout-summary {
@@ -906,6 +975,11 @@
       }
 
       @media print {
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
         body {
           color: #111;
           background: #fff;
@@ -919,47 +993,249 @@
 
         .print-report {
           display: block;
-          padding: 36px;
+          width: 210mm;
+          padding: 0;
           color: #111;
           direction: rtl;
           font-family: "Tajawal", sans-serif;
         }
 
-        .print-report h1 {
-          margin: 0 0 4px;
-          font-size: 24px;
+        .official-page {
+          position: relative;
+          width: 210mm;
+          min-height: 297mm;
+          padding: 16mm 14mm 13mm;
+          overflow: hidden;
+          background: #fff;
+          page-break-after: always;
         }
 
-        .print-report h2 {
-          margin: 0 0 24px;
-          color: #745332;
-          font-size: 16px;
-          font-weight: 500;
+        .official-page:last-child {
+          page-break-after: auto;
         }
 
-        .print-report dl {
-          display: grid;
-          grid-template-columns: 170px 1fr;
-          gap: 0;
-          margin: 0;
-          border: 1px solid #c7c7c7;
+        .official-page::before,
+        .official-page::after {
+          position: absolute;
+          right: 0;
+          left: 0;
+          height: 5mm;
+          background: #d4b461;
+          content: "";
         }
 
-        .print-report dt,
-        .print-report dd {
-          margin: 0;
-          padding: 10px 12px;
-          border-bottom: 1px solid #ddd;
+        .official-page::before {
+          top: 0;
         }
 
-        .print-report dt {
+        .official-page::after {
+          bottom: 0;
+          background: linear-gradient(90deg, #a70c0c 0 24%, #d4b461 24% 100%);
+        }
+
+        .official-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          min-height: 29mm;
+          padding: 5mm 0 3mm;
+          border-bottom: 1px solid #c8c8c8;
+        }
+
+        .official-header img {
+          width: 25mm;
+          height: 25mm;
+          object-fit: contain;
+        }
+
+        .official-header-center {
+          flex: 1;
+          text-align: center;
+        }
+
+        .official-header-center strong {
+          display: block;
+          font-size: 17px;
+        }
+
+        .official-header-center span {
+          display: block;
+          margin-top: 3px;
+          color: #a40d0d;
+          font-size: 13px;
           font-weight: 700;
-          background: #f4efe8;
         }
 
-        .print-report dd {
-          border-right: 1px solid #ddd;
+        .official-page h1 {
+          margin: 6mm 0 5mm;
+          color: #111;
+          font-size: 21px;
+          font-weight: 900;
+          text-align: center;
         }
+
+        .official-page h2 {
+          margin: 4mm 0 3mm;
+          color: #a40d0d;
+          font-size: 15px;
+        }
+
+        .print-section-title {
+          margin: 4mm 0 1mm;
+          color: #a40d0d;
+          font-size: 14px;
+          font-weight: 800;
+        }
+
+        .template-print-table {
+          width: 100%;
+          margin-bottom: 3mm;
+          border-collapse: collapse;
+          table-layout: fixed;
+          font-size: 10px;
+        }
+
+        .template-print-table th,
+        .template-print-table td {
+          min-height: 9mm;
+          padding: 2.5mm 3mm;
+          color: #111;
+          vertical-align: middle;
+          border: 1px solid #fff;
+        }
+
+        .template-print-table th {
+          width: 18%;
+          color: #fff;
+          background: #a8a8a8;
+          font-weight: 700;
+        }
+
+        .template-print-table td {
+          width: 32%;
+          background: #ececec;
+          text-align: center;
+          word-break: break-word;
+        }
+
+        .template-print-table .large-cell {
+          min-height: 22mm;
+          vertical-align: top;
+          text-align: right;
+          white-space: pre-line;
+        }
+
+        .print-description {
+          min-height: 30mm;
+          padding: 3mm;
+          color: #111;
+          background: #ececec;
+          border: 1px solid #fff;
+          white-space: pre-line;
+        }
+
+        .photo-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 6mm;
+          margin: 7mm 0 12mm;
+        }
+
+        .photo-box {
+          display: grid;
+          place-items: center;
+          height: 67mm;
+          overflow: hidden;
+          color: #777;
+          background: #fafafa;
+          border: 1px solid #a40d0d;
+          border-radius: 9mm;
+          font-size: 11px;
+        }
+
+        .photo-box img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .qr-print-title {
+          margin: 0 0 6mm;
+          color: #a40d0d;
+          font-size: 13px;
+          text-align: center;
+        }
+
+        .qr-print-box {
+          display: grid;
+          place-items: center;
+          width: 38mm;
+          height: 38mm;
+          margin: 0 auto;
+          border: 1px solid #bdbdbd;
+        }
+
+        .qr-print-box img {
+          width: 31mm;
+          height: 31mm;
+        }
+
+        .meeting-info-table td,
+        .meeting-info-table th {
+          min-height: 10mm;
+        }
+
+        .attendance-box {
+          width: 70%;
+          margin: 9mm auto;
+          border: 1px solid #aaa;
+        }
+
+        .attendance-box h3 {
+          margin: 0;
+          padding: 3mm;
+          font-size: 13px;
+          text-align: center;
+          border-bottom: 1px solid #aaa;
+        }
+
+        .attendance-box p {
+          min-height: 15mm;
+          margin: 0;
+          padding: 4mm;
+          color: #111;
+          text-align: center;
+          white-space: pre-line;
+        }
+
+        .meeting-intro {
+          margin: 14mm 0 6mm;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .meeting-recommendations {
+          margin: 0;
+          padding-right: 7mm;
+          color: #111;
+          font-size: 12px;
+          line-height: 2;
+          white-space: pre-line;
+        }
+
+        .meeting-recommendations li {
+          padding-right: 2mm;
+        }
+
+        .meeting-signature {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 18mm;
+          color: #333;
+          font-size: 11px;
+        }
+
       }
     </style>
   </head>
@@ -1006,9 +1282,9 @@
               <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
               <span>الرئيسية والإحصائيات</span>
             </button>
-            <button class="nav-button" data-view="report-form" type="button">
+            <button class="nav-button" data-view="official-forms" type="button">
               <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
-              <span>إنشاء تقرير جديد</span>
+              <span>النماذج الرسمية</span>
             </button>
             <button class="nav-button" data-view="scouts" type="button">
               <i class="fa-solid fa-users" aria-hidden="true"></i>
@@ -1040,7 +1316,7 @@
               <h2 class="page-title">لوحة التحكم الإدارية</h2>
               <p class="page-description">ملخص أنشطة وإحصائيات فرقة متقدم النعيم الكشفي</p>
             </div>
-            <button class="primary-button" data-go-view="report-form" type="button">
+            <button class="primary-button" data-go-view="official-forms" type="button">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
               إنشاء تقرير جديد
             </button>
@@ -1123,73 +1399,202 @@
           </section>
         </section>
 
-        <section id="view-report-form" class="view" data-view-panel="report-form" hidden>
+        <section id="view-official-forms" class="view" data-view-panel="official-forms" hidden>
           <header class="page-heading">
             <div>
-              <p class="eyebrow">نموذج رسمي معتمد</p>
-              <h2 class="page-title">تعبئة نموذج تقرير فعالية كشفية</h2>
-              <p class="page-description">سجّل تفاصيل النشاط وسيتم تجهيز نسخة قابلة للطباعة بصيغة PDF.</p>
+              <p class="eyebrow">القوالب الرسمية المعتمدة</p>
+              <h2 class="page-title">إنشاء النماذج والتقارير</h2>
+              <p class="page-description">عبّئ المطلوب، ثم اطبع النموذج أو احفظه مباشرة بصيغة PDF.</p>
             </div>
           </header>
 
-          <form id="report-form" class="card report-form">
-            <section class="form-section">
-              <h3 class="form-section-title">أولاً: معلومات عامة</h3>
-              <div class="form-grid">
-                <div class="field">
-                  <label for="rep-title">اسم البرنامج / الفعالية *</label>
-                  <input id="rep-title" type="text" required placeholder="مثال: نشاط الخلاء الكشفي" />
-                </div>
-                <div class="field">
-                  <label for="rep-axis">المحور *</label>
-                  <input id="rep-axis" type="text" required placeholder="المجال الكشفي والتربوي" />
-                </div>
-              </div>
-              <div class="form-grid three">
-                <div class="field">
-                  <label for="rep-date">اليوم والتاريخ *</label>
-                  <input id="rep-date" type="date" required />
-                </div>
-                <div class="field">
-                  <label for="rep-target">الفئة المستهدفة</label>
-                  <input id="rep-target" type="text" value="كشافة فرقة المتقدم" />
-                </div>
-                <div class="field">
-                  <label for="rep-count">عدد المستفيدين</label>
-                  <input id="rep-count" type="number" min="1" value="24" />
-                </div>
-              </div>
-            </section>
+          <div class="template-tabs" role="tablist" aria-label="اختيار النموذج">
+            <button class="template-tab active" data-template-tab="activity" type="button">
+              <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+              تقرير فعالية كشفية
+            </button>
+            <button class="template-tab" data-template-tab="meeting" type="button">
+              <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+              محضر اجتماع مجلس الشرف
+            </button>
+          </div>
 
-            <section class="form-section">
-              <h3 class="form-section-title">ثانياً: أهداف البرنامج</h3>
-              <div class="field">
-                <label for="rep-general-goal">الهدف العام</label>
-                <textarea id="rep-general-goal" placeholder="تعزيز المهارات الحياتية والكشفية..."></textarea>
-              </div>
-            </section>
-
-            <section class="form-section">
-              <h3 class="form-section-title">ثالثاً: تغطية الفيديو (QR Code)</h3>
-              <div class="qr-row">
-                <div class="field" style="flex: 1 1 300px">
-                  <label for="rep-video-url">رابط فيديو النشاط (سيتم تحويله تلقائياً لرمز QR)</label>
-                  <input id="rep-video-url" type="url" placeholder="https://..." />
+          <div id="template-activity" class="template-panel">
+            <form id="activity-form" class="card report-form">
+              <section class="form-section">
+                <h3 class="form-section-title">أولاً: معلومات عامة</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="act-title">اسم البرنامج *</label>
+                    <input id="act-title" type="text" required placeholder="مثال: نشاط الخلاء الكشفي" />
+                  </div>
+                  <div class="field">
+                    <label for="act-axis">المحور *</label>
+                    <input id="act-axis" type="text" required placeholder="المجال الكشفي والتربوي" />
+                  </div>
+                  <div class="field">
+                    <label for="act-target">الفئة المستهدفة</label>
+                    <input id="act-target" type="text" value="كشافة فرقة المتقدم" />
+                  </div>
+                  <div class="field">
+                    <label for="act-date">اليوم والتاريخ *</label>
+                    <input id="act-date" type="date" required />
+                  </div>
+                  <div class="field">
+                    <label for="act-responsible">مسؤولية التنفيذ</label>
+                    <input id="act-responsible" type="text" placeholder="قائد الفرقة / العريف الأول" />
+                  </div>
+                  <div class="field">
+                    <label for="act-count">عدد المستفيدين</label>
+                    <input id="act-count" type="number" min="1" value="24" />
+                  </div>
+                  <div class="field">
+                    <label for="act-partners">الجهات المتعاونة</label>
+                    <input id="act-partners" type="text" placeholder="إن وجدت" />
+                  </div>
+                  <div class="field">
+                    <label for="act-budget">الميزانية (إن وجدت)</label>
+                    <input id="act-budget" type="text" placeholder="مثال: 25 د.ب" />
+                  </div>
                 </div>
-                <div id="qr-preview-container" class="qr-preview" hidden>
-                  <div id="qrcode" aria-label="معاينة رمز QR"></div>
-                  <span class="qr-caption">معاينة رمز الـ QR المطبوع</span>
-                </div>
-              </div>
-            </section>
+              </section>
 
-            <div class="form-actions">
-              <button class="danger-button" type="submit">
-                <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
-                تجهيز التقرير للطباعة / PDF
-              </button>
-            </div>
-          </form>
+              <section class="form-section">
+                <h3 class="form-section-title">ثانياً: أهداف البرنامج</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="act-general-goal">الهدف العام</label>
+                    <textarea id="act-general-goal" placeholder="اكتب الهدف العام للبرنامج..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="act-objectives">الأهداف الإجرائية</label>
+                    <textarea id="act-objectives" placeholder="اكتب كل هدف في سطر مستقل..."></textarea>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <h3 class="form-section-title">ثالثاً: وصف البرنامج</h3>
+                <div class="form-grid three">
+                  <div class="field">
+                    <label for="act-from">وقت التنفيذ من</label>
+                    <input id="act-from" type="time" />
+                  </div>
+                  <div class="field">
+                    <label for="act-to">وقت التنفيذ إلى</label>
+                    <input id="act-to" type="time" />
+                  </div>
+                  <div class="field">
+                    <label for="act-output">المخرج النهائي للبرنامج</label>
+                    <input id="act-output" type="text" placeholder="ما الذي تحقق؟" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="act-description">وصف البرنامج</label>
+                  <textarea id="act-description" rows="4" placeholder="اكتب وصفاً مختصراً لسير النشاط..."></textarea>
+                </div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="act-strengths">نقاط القوة</label>
+                    <textarea id="act-strengths" placeholder="ما الذي سار بشكل جيد؟"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="act-weaknesses">نقاط الضعف</label>
+                    <textarea id="act-weaknesses" placeholder="ما الذي يحتاج إلى تحسين؟"></textarea>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="act-improvements">فرص التحسين والتطوير</label>
+                  <textarea id="act-improvements" placeholder="ما المقترحات للأنشطة القادمة؟"></textarea>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <h3 class="form-section-title">رابعاً وخامساً: صور النشاط وتغطية الفيديو</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="act-video">رابط فيديو النشاط (سيتم تحويله إلى QR)</label>
+                    <input id="act-video" type="url" placeholder="https://..." />
+                  </div>
+                  <div id="activity-qr-preview" class="qr-preview" hidden>
+                    <div id="activity-qrcode" aria-label="معاينة رمز QR"></div>
+                    <span class="qr-caption">معاينة رمز QR</span>
+                  </div>
+                </div>
+                <div class="file-grid">
+                  <div class="file-field"><label for="act-image-1">صورة النشاط 1</label><input id="act-image-1" type="file" accept="image/*" /></div>
+                  <div class="file-field"><label for="act-image-2">صورة النشاط 2</label><input id="act-image-2" type="file" accept="image/*" /></div>
+                  <div class="file-field"><label for="act-image-3">صورة النشاط 3</label><input id="act-image-3" type="file" accept="image/*" /></div>
+                  <div class="file-field"><label for="act-image-4">صورة النشاط 4</label><input id="act-image-4" type="file" accept="image/*" /></div>
+                </div>
+              </section>
+
+              <div class="form-actions">
+                <button class="danger-button" type="submit">
+                  <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                  توليد نموذج تقرير الفعالية
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="template-meeting" class="template-panel" hidden>
+            <form id="meeting-form" class="card report-form">
+              <section class="form-section">
+                <h3 class="form-section-title">بيانات اجتماع مجلس الشرف</h3>
+                <div class="form-grid three">
+                  <div class="field">
+                    <label for="meeting-date">التاريخ *</label>
+                    <input id="meeting-date" type="date" required />
+                  </div>
+                  <div class="field">
+                    <label for="meeting-day">اليوم *</label>
+                    <input id="meeting-day" type="text" required placeholder="مثال: الاثنين" />
+                  </div>
+                  <div class="field">
+                    <label for="meeting-location">الموقع *</label>
+                    <input id="meeting-location" type="text" required value="مدرسة النعيم الثانوية للبنين" />
+                  </div>
+                  <div class="field">
+                    <label for="meeting-start">وقت البدء</label>
+                    <input id="meeting-start" type="time" />
+                  </div>
+                  <div class="field">
+                    <label for="meeting-end">وقت الانتهاء</label>
+                    <input id="meeting-end" type="time" />
+                  </div>
+                  <div class="field">
+                    <label for="meeting-chair">رئيس الاجتماع</label>
+                    <input id="meeting-chair" type="text" placeholder="العريف الأول ونائبه" />
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <h3 class="form-section-title">الحضور</h3>
+                <div class="field">
+                  <label for="meeting-attendees">أسماء الحضور</label>
+                  <textarea id="meeting-attendees" placeholder="اكتب أسماء الحضور، كل اسم في سطر مستقل...">العريف الأول ونائبه
+العرفاء</textarea>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <h3 class="form-section-title">تفاصيل الاجتماع والتوصيات</h3>
+                <div class="field">
+                  <label for="meeting-agenda">التفاصيل والتوصيات *</label>
+                  <textarea id="meeting-agenda" rows="8" required placeholder="اكتب محاور الاجتماع والتوصيات، كل نقطة في سطر مستقل..."></textarea>
+                </div>
+              </section>
+
+              <div class="form-actions">
+                <button class="danger-button" type="submit">
+                  <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                  توليد محضر الاجتماع
+                </button>
+              </div>
+            </form>
+          </div>
         </section>
 
         <section id="view-scouts" class="view" data-view-panel="scouts" hidden>
@@ -1262,7 +1667,7 @@
               <form id="add-user-form" class="add-user-form">
                 <div class="field">
                   <label for="new-user-name">اسم المستخدم أو البريد *</label>
-                  <input id="new-user-name" type="text" required placeholder="مثال: supervisor@scouts.bh" />
+                  <input id="new-user-name" type="text" required placeholder="مثال: supervisor@scouts.bh" autocomplete="username" />
                 </div>
                 <div class="field">
                   <label for="new-user-full-name">الاسم الكامل *</label>
@@ -1444,9 +1849,21 @@
         showToast(`تم حذف المستخدم ${userName}`);
       });
 
-      const qrContainer = document.getElementById("qr-preview-container");
-      const qrTarget = document.getElementById("qrcode");
-      document.getElementById("rep-video-url").addEventListener("input", (event) => {
+      document.querySelectorAll("[data-template-tab]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const templateName = button.dataset.templateTab;
+          document.querySelectorAll("[data-template-tab]").forEach((tab) => {
+            tab.classList.toggle("active", tab === button);
+          });
+          document.querySelectorAll(".template-panel").forEach((panel) => {
+            panel.hidden = panel.id !== `template-${templateName}`;
+          });
+        });
+      });
+
+      const qrContainer = document.getElementById("activity-qr-preview");
+      const qrTarget = document.getElementById("activity-qrcode");
+      document.getElementById("act-video").addEventListener("input", (event) => {
         const url = event.target.value.trim();
         qrTarget.replaceChildren();
         if (!url) {
@@ -1462,6 +1879,15 @@
         });
       });
 
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
       function formatDate(dateValue) {
         if (!dateValue) return "غير محدد";
         return new Intl.DateTimeFormat("ar-BH", {
@@ -1469,30 +1895,143 @@
         }).format(new Date(`${dateValue}T00:00:00`));
       }
 
-      document.getElementById("report-form").addEventListener("submit", (event) => {
+      function formatTime(timeValue) {
+        if (!timeValue) return "—";
+        return new Intl.DateTimeFormat("ar-BH", {
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(new Date(`2026-01-01T${timeValue}`));
+      }
+
+      function fileToDataUrl(file) {
+        if (!file) return Promise.resolve("");
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.addEventListener("load", () => resolve(reader.result));
+          reader.addEventListener("error", () => resolve(""));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function qrDataUrl() {
+        const canvas = qrTarget.querySelector("canvas");
+        if (canvas) return canvas.toDataURL("image/png");
+        return qrTarget.querySelector("img")?.src || "";
+      }
+
+      function linesAsList(value, emptyText) {
+        const lines = String(value || "")
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        if (!lines.length) return `<li>${escapeHtml(emptyText)}</li>`;
+        return lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
+      }
+
+      document.getElementById("activity-form").addEventListener("submit", async (event) => {
         event.preventDefault();
-        const title = document.getElementById("rep-title").value.trim();
-        const axis = document.getElementById("rep-axis").value.trim();
-        const date = document.getElementById("rep-date").value;
-        const target = document.getElementById("rep-target").value.trim();
-        const count = document.getElementById("rep-count").value;
-        const goal = document.getElementById("rep-general-goal").value.trim() || "لم يتم إدخال هدف عام.";
-        const videoUrl = document.getElementById("rep-video-url").value.trim() || "لا يوجد رابط فيديو مرفق.";
+        const value = (id, fallback = "—") => {
+          const text = document.getElementById(id).value.trim();
+          return escapeHtml(text || fallback);
+        };
+        const images = await Promise.all(
+          [1, 2, 3, 4].map((number) => fileToDataUrl(document.getElementById(`act-image-${number}`).files[0])),
+        );
+        const photos = images
+          .map((src) => src
+            ? `<img src="${src}" alt="صورة النشاط" />`
+            : "<span>صورة النشاط</span>")
+          .join("");
 
         document.getElementById("print-report").innerHTML = `
-          <h1>فرقة متقدم النعيم الكشفي</h1>
-          <h2>تقرير فعالية كشفية — ${title}</h2>
-          <dl>
-            <dt>اسم الفعالية</dt><dd>${title}</dd>
-            <dt>المحور</dt><dd>${axis}</dd>
-            <dt>التاريخ</dt><dd>${formatDate(date)}</dd>
-            <dt>الفئة المستهدفة</dt><dd>${target}</dd>
-            <dt>عدد المستفيدين</dt><dd>${count}</dd>
-            <dt>الهدف العام</dt><dd>${goal}</dd>
-            <dt>رابط التغطية</dt><dd>${videoUrl}</dd>
-          </dl>
+          <div class="official-page activity-print">
+            <div class="official-header">
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+              <div class="official-header-center">
+                <strong>مملكة البحرين</strong>
+                <span>وزارة التربية والتعليم<br />فرقة متقدم النعيم الكشفية</span>
+              </div>
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+            </div>
+            <h1>نموذج تقرير فعالية كشفية العام الدراسي 2026-2027م</h1>
+            <div class="print-section-title">أولاً: معلومات عامة:</div>
+            <table class="template-print-table">
+              <tr><th>اسم البرنامج</th><td>${value("act-title")}</td><th>المحور</th><td>${value("act-axis")}</td></tr>
+              <tr><th>اليوم والتاريخ</th><td>${formatDate(document.getElementById("act-date").value)}</td><th>الفئة المستهدفة</th><td>${value("act-target")}</td></tr>
+              <tr><th>مسؤولية التنفيذ</th><td>${value("act-responsible")}</td><th>عدد المستفيدين</th><td>${value("act-count")}</td></tr>
+              <tr><th>الجهات المتعاونة</th><td>${value("act-partners")}</td><th>الميزانية (إن وجدت)</th><td>${value("act-budget")}</td></tr>
+            </table>
+            <div class="print-section-title">ثانياً: أهداف البرنامج:</div>
+            <table class="template-print-table">
+              <tr><th>الهدف العام</th><td colspan="3" class="large-cell">${value("act-general-goal")}</td></tr>
+              <tr><th>الأهداف الإجرائية</th><td colspan="3" class="large-cell">${value("act-objectives")}</td></tr>
+            </table>
+            <div class="print-section-title">ثالثاً: وصف البرنامج:</div>
+            <table class="template-print-table">
+              <tr><th>المخرج النهائي للبرنامج</th><td>${value("act-output")}</td><th>وقت التنفيذ</th><td>${formatTime(document.getElementById("act-from").value)} — ${formatTime(document.getElementById("act-to").value)}</td></tr>
+            </table>
+            <div class="print-description">${value("act-description")}</div>
+            <table class="template-print-table">
+              <tr><th>نقاط القوة</th><td class="large-cell">${value("act-strengths")}</td><th>نقاط الضعف</th><td class="large-cell">${value("act-weaknesses")}</td></tr>
+              <tr><th colspan="2">فرص التحسين والتطوير</th><td colspan="2" class="large-cell">${value("act-improvements")}</td></tr>
+            </table>
+          </div>
+          <div class="official-page activity-print">
+            <div class="official-header">
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+              <div class="official-header-center">
+                <strong>${value("act-title")}</strong>
+                <span>رابعاً وخامساً: الصور وتغطية النشاط</span>
+              </div>
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+            </div>
+            <div class="print-section-title">رابعاً: صور النشاط</div>
+            <div class="photo-grid">${photos}</div>
+            <p class="qr-print-title">خامساً: تغطية النشاط (لصق QR فيديو النشاط داخل المربع المحدد)</p>
+            <div class="qr-print-box">${qrDataUrl() ? `<img src="${qrDataUrl()}" alt="رمز QR للفيديو" />` : "<span>لا يوجد QR</span>"}</div>
+          </div>
         `;
         showToast("تم تجهيز التقرير، اختر الطباعة ثم حفظ بصيغة PDF");
+        window.print();
+      });
+
+      document.getElementById("meeting-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = (id, fallback = "—") => {
+          const text = document.getElementById(id).value.trim();
+          return escapeHtml(text || fallback);
+        };
+        const agenda = document.getElementById("meeting-agenda").value;
+
+        document.getElementById("print-report").innerHTML = `
+          <div class="official-page meeting-print">
+            <div class="official-header">
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+              <div class="official-header-center">
+                <strong>مملكة البحرين</strong>
+                <span>وزارة التربية والتعليم<br />فرقة متقدم النعيم الكشفية</span>
+              </div>
+              <img src="/attached_assets/image_1789389348245.png" alt="شعار الفرقة" />
+            </div>
+            <h1>تقرير اجتماع مجلس الشرف</h1>
+            <table class="template-print-table meeting-info-table">
+              <tr><th>اليوم</th><td>${value("meeting-day")}</td><th>التاريخ</th><td>${formatDate(document.getElementById("meeting-date").value)}</td></tr>
+              <tr><th>البدء</th><td>${formatTime(document.getElementById("meeting-start").value)}</td><th>الانتهاء</th><td>${formatTime(document.getElementById("meeting-end").value)}</td></tr>
+              <tr><th>الموقع</th><td colspan="3">${value("meeting-location")}</td></tr>
+            </table>
+            <div class="attendance-box">
+              <h3>الحضور</h3>
+              <p>${value("meeting-attendees")}</p>
+            </div>
+            <p class="meeting-intro">انعقد الاجتماع وتم الخروج بالتفاصيل والتوصيات التالية:</p>
+            <ul class="meeting-recommendations">${linesAsList(agenda, "لم يتم إدخال تفاصيل أو توصيات.")}</ul>
+            <div class="meeting-signature">
+              <span>رئيس الاجتماع: ${value("meeting-chair")}</span>
+              <span>التوقيع: __________________</span>
+            </div>
+          </div>
+        `;
+        showToast("تم تجهيز محضر الاجتماع، اختر الطباعة ثم حفظ بصيغة PDF");
         window.print();
       });
 
@@ -1502,7 +2041,10 @@
         });
       });
 
-      document.getElementById("rep-date").value = new Date().toISOString().slice(0, 10);
+      const today = new Date();
+      document.getElementById("act-date").value = today.toISOString().slice(0, 10);
+      document.getElementById("meeting-date").value = today.toISOString().slice(0, 10);
+      document.getElementById("meeting-day").value = new Intl.DateTimeFormat("ar-BH", { weekday: "long" }).format(today);
     </script>
   </body>
 </html>
