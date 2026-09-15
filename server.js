@@ -30,7 +30,40 @@ app.get("/app.css", (request, response) => {
   response.type("css").send(`${baseStyles}\n${responsiveStyles}\n${polishStyles}`);
 });
 app.get("/index.html", (request, response) => response.redirect(302, "/login"));
-app.get("/legacy-forms", (request, response) => response.sendFile(path.join(__dirname, "index.html")));
+app.get("/legacy-forms", requireAuth, requirePermission("official-forms"), (request, response) => response.sendFile(path.join(__dirname, "index.html")));
+
+const protectedPages = {
+  "/dashboard": "dashboard",
+  "/dashboard.html": "dashboard",
+  "/forms": "official-forms",
+  "/forms.html": "official-forms",
+  "/reports": "reports",
+  "/reports.html": "reports",
+  "/members": "members",
+  "/members.html": "members",
+  "/supervisors": "supervisors",
+  "/supervisors.html": "supervisors",
+  "/settings": "settings",
+  "/settings.html": "settings",
+  "/legacy-forms": "official-forms",
+};
+
+app.use(async (request, response, next) => {
+  const pageKey = protectedPages[request.path];
+  if (!pageKey) return next();
+
+  try {
+    const user = await getCurrentUser(request);
+    if (!user) return response.redirect(302, "/login");
+    if (!can(user, pageKey)) {
+      return response.status(403).type("html").send(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>غير مخول</title><link rel="stylesheet" href="/app.css"></head><body class="login-page"><main class="login-card"><h1>أنت غير مخول</h1><p class="muted">لا تملك صلاحية الوصول إلى هذه الصفحة.</p><a class="button primary" href="/dashboard">العودة للرئيسية</a></main></body></html>`);
+    }
+    request.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (request, response) => {
