@@ -36,6 +36,7 @@ const protectedPages = {
   "/dashboard": "dashboard",
   "/dashboard.html": "dashboard",
   "/forms": "official-forms",
+  "/forms-generator": "official-forms",
   "/forms.html": "official-forms",
   "/reports": "reports",
   "/reports.html": "reports",
@@ -73,7 +74,8 @@ app.get("/", (request, response) => {
 const pageRoutes = {
   "/login": "login.html",
   "/dashboard": "dashboard.html",
-  "/forms": "index.html",
+  "/forms": "forms.html",
+  "/forms-generator": "index.html",
   "/reports": "reports.html",
   "/members": "members.html",
   "/supervisors": "supervisors.html",
