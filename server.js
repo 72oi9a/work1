@@ -30,7 +30,7 @@ app.get("/app.css", (request, response) => {
   response.type("css").send(`${baseStyles}\n${responsiveStyles}\n${polishStyles}`);
 });
 app.get("/index.html", (request, response) => response.redirect(302, "/login"));
-app.get("/legacy-forms", requireAuth, requirePermission("official-forms"), (request, response) => response.sendFile(path.join(__dirname, "index.html")));
+app.get("/legacy-forms", (request, response) => response.redirect(301, "/forms#official-forms"));
 
 const protectedPages = {
   "/dashboard": "dashboard",
@@ -73,7 +73,7 @@ app.get("/", (request, response) => {
 const pageRoutes = {
   "/login": "login.html",
   "/dashboard": "dashboard.html",
-  "/forms": "forms.html",
+  "/forms": "index.html",
   "/reports": "reports.html",
   "/members": "members.html",
   "/supervisors": "supervisors.html",
