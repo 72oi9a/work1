@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Keep clean page URLs on PHP hosting.
+RewriteRule ^(login|dashboard|forms|reports|members|supervisors|settings)/?$ $1.html [L]
+RewriteRule ^legacy-forms/?$ /forms [R=301,L]
+RewriteRule ^api/(.*)$ index.php [QSA,L]
+
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|svg|webp|woff2?)$">
+  Header set Cache-Control "public, max-age=86400"
+</FilesMatch>

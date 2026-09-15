@@ -53,4 +53,4 @@ if (str_starts_with($path, '/api/')) {
 }
 
 header('Content-Type: text/html; charset=utf-8');
-readfile(__DIR__ . '/index.html');
+readfile(__DIR__ . '/login.html');
