@@ -16,7 +16,7 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
-const PAGE_KEYS = ["dashboard", "official-forms", "members", "supervisors", "reports"];
+const PAGE_KEYS = ["dashboard", "official-forms", "members", "supervisors", "reports", "settings"];
 const SESSION_COOKIE = "scout_session";
 
 // Middlewares الأساسية
@@ -165,6 +165,7 @@ async function seedPermissions(userId, role) {
           ["members", true, true, true, false],
           ["supervisors", false, false, false, false],
           ["reports", true, true, false, false],
+          ["settings", false, false, false, false],
         ];
 
   for (const [pageKey, view, create, edit, remove] of permissions) {
@@ -391,6 +392,62 @@ app.get("/api/dashboard", requireAuth, requirePermission("dashboard"), async (re
     });
   } catch (error) {
     next(error);
+  }
+});
+
+app.get("/api/system/monitor", requireAuth, requirePermission("settings"), async (request, response, next) => {
+  try {
+    const [members, activities, meetings, users, database] = await Promise.all([
+      pool.query("SELECT COUNT(*)::int AS count FROM members"),
+      pool.query("SELECT COUNT(*)::int AS count FROM activity_reports"),
+      pool.query("SELECT COUNT(*)::int AS count FROM meeting_minutes"),
+      pool.query("SELECT COUNT(*)::int AS count FROM users WHERE active = TRUE"),
+      pool.query("SELECT NOW() AS checked_at"),
+    ]);
+
+    response.json({
+      database: "connected",
+      checkedAt: database.rows[0].checked_at,
+      counts: {
+        members: members.rows[0].count,
+        activities: activities.rows[0].count,
+        meetings: meetings.rows[0].count,
+        users: users.rows[0].count,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/system/reset", requireAuth, requirePermission("settings", "delete"), async (request, response, next) => {
+  if (request.body?.confirmation !== "تصفير") {
+    return sendError(response, 400, "اكتب كلمة تصفير للتأكيد");
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const deleted = await client.query(`
+      WITH deleted_activity AS (
+        DELETE FROM activity_reports RETURNING 1
+      ), deleted_meetings AS (
+        DELETE FROM meeting_minutes RETURNING 1
+      ), deleted_members AS (
+        DELETE FROM members RETURNING 1
+      )
+      SELECT
+        (SELECT COUNT(*)::int FROM deleted_activity) AS activities,
+        (SELECT COUNT(*)::int FROM deleted_meetings) AS meetings,
+        (SELECT COUNT(*)::int FROM deleted_members) AS members
+    `);
+    await client.query("COMMIT");
+    response.json({ ok: true, deleted: deleted.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    next(error);
+  } finally {
+    client.release();
   }
 });
 

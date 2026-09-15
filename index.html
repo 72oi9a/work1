@@ -772,6 +772,83 @@
         font-size: 12px;
       }
 
+      .monitor-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .monitor-item {
+        display: grid;
+        gap: 8px;
+        min-height: 108px;
+        padding: 16px;
+        border: 1px solid var(--line-soft);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.16);
+      }
+
+      .monitor-item span {
+        color: var(--muted-dark);
+        font-size: 11px;
+      }
+
+      .monitor-item strong {
+        color: var(--khaki);
+        font-size: 22px;
+      }
+
+      .monitor-item strong.connected {
+        color: var(--success);
+        font-size: 15px;
+      }
+
+      .reset-panel {
+        display: grid;
+        gap: 14px;
+        padding: 20px;
+        border: 1px solid rgba(180, 35, 24, 0.45);
+        border-radius: 14px;
+        background: rgba(127, 29, 29, 0.12);
+      }
+
+      .reset-panel h3,
+      .reset-panel p {
+        margin: 0;
+      }
+
+      .reset-panel h3 {
+        color: #fca5a5;
+        font-size: 15px;
+      }
+
+      .reset-panel p {
+        color: #c4c4c9;
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      .reset-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .reset-controls input {
+        flex: 1;
+        min-width: 0;
+        height: 43px;
+        padding: 0 12px;
+        color: #fff;
+        background: #101010;
+        border: 1px solid #5b2925;
+        border-radius: 9px;
+      }
+
+      .reset-controls button {
+        flex: 0 0 auto;
+      }
+
       .modal-backdrop {
         position: fixed;
         z-index: 20;
@@ -998,7 +1075,8 @@
 
         .form-grid,
         .form-grid.three,
-        .scout-summary {
+        .scout-summary,
+        .monitor-grid {
           grid-template-columns: 1fr;
         }
 
@@ -1013,6 +1091,15 @@
         .form-actions,
         .qr-row {
           flex-direction: column;
+        }
+
+        .reset-controls {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .reset-controls button {
+          width: 100%;
         }
 
         .form-actions .primary-button,
@@ -1578,6 +1665,10 @@
               <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
               <span>المشرفون</span>
             </button>
+            <button class="nav-button" data-view="settings" type="button">
+              <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+              <span>الإعدادات</span>
+            </button>
           </nav>
         </div>
 
@@ -2030,6 +2121,39 @@
             </section>
           </div>
         </section>
+
+        <section id="view-settings" class="view" data-view-panel="settings" hidden>
+          <header class="page-heading">
+            <div>
+              <p class="eyebrow">إعدادات النظام</p>
+              <h2 class="page-title">المراقبة والتصفير</h2>
+              <p class="page-description">راقب حالة الخدمة وقاعدة البيانات، أو صفّر بيانات التشغيل مع بقاء الحسابات والصلاحيات.</p>
+            </div>
+          </header>
+
+          <section class="card section-card">
+            <div class="section-heading">
+              <h3 class="section-title"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>حالة المنظومة</h3>
+              <button id="refresh-monitor" class="ghost-button" type="button"><i class="fa-solid fa-rotate" aria-hidden="true"></i>تحديث</button>
+            </div>
+            <div class="monitor-grid">
+              <div class="monitor-item"><span>قاعدة البيانات</span><strong id="monitor-database" class="connected">جاري الفحص...</strong></div>
+              <div class="monitor-item"><span>الأعضاء</span><strong id="monitor-members">0</strong></div>
+              <div class="monitor-item"><span>تقارير الفعاليات</span><strong id="monitor-activities">0</strong></div>
+              <div class="monitor-item"><span>محاضر الاجتماعات</span><strong id="monitor-meetings">0</strong></div>
+            </div>
+            <p id="monitor-checked-at" class="section-note">آخر فحص: —</p>
+          </section>
+
+          <section class="reset-panel">
+            <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> تصفير بيانات التشغيل</h3>
+            <p>سيتم حذف الأعضاء والتقارير ومحاضر الاجتماعات فقط. لن يتم حذف المستخدمين أو كلمات المرور أو الصلاحيات. هذا الإجراء نهائي.</p>
+            <div class="reset-controls">
+              <input id="reset-confirmation" type="text" placeholder="اكتب: تصفير" autocomplete="off" />
+              <button id="reset-data" class="danger-button" type="button"><i class="fa-solid fa-trash-can" aria-hidden="true"></i>تصفير البيانات</button>
+            </div>
+          </section>
+        </section>
       </main>
     </div>
 
@@ -2063,6 +2187,7 @@
           button.classList.toggle("active", button.dataset.view === viewName);
         });
         window.scrollTo({ top: 0, behavior: "smooth" });
+        if (viewName === "settings") loadSystemMonitor();
       }
 
       async function apiFetch(path, options = {}) {
@@ -2239,6 +2364,20 @@
         }
       }
 
+      async function loadSystemMonitor() {
+        try {
+          const result = await apiFetch("/api/system/monitor");
+          document.getElementById("monitor-database").textContent = result.database === "connected" ? "متصلة" : "غير متصلة";
+          document.getElementById("monitor-members").textContent = result.counts.members;
+          document.getElementById("monitor-activities").textContent = result.counts.activities;
+          document.getElementById("monitor-meetings").textContent = result.counts.meetings;
+          document.getElementById("monitor-checked-at").textContent = `آخر فحص: ${new Date(result.checkedAt).toLocaleString("ar-BH")}`;
+        } catch (error) {
+          document.getElementById("monitor-database").textContent = "غير متصلة";
+          showToast(error.message);
+        }
+      }
+
       async function loadSession() {
         try {
           const result = await apiFetch("/api/auth/me");
@@ -2284,6 +2423,29 @@
           await apiFetch("/api/auth/logout", { method: "POST" });
           loginModal.hidden = false;
           showToast("تم تسجيل الخروج");
+        } catch (error) {
+          showToast(error.message);
+        }
+      });
+
+      document.getElementById("refresh-monitor").addEventListener("click", loadSystemMonitor);
+
+      document.getElementById("reset-data").addEventListener("click", async () => {
+        const confirmation = document.getElementById("reset-confirmation").value.trim();
+        if (confirmation !== "تصفير") {
+          showToast("اكتب كلمة تصفير كما هي للتأكيد");
+          return;
+        }
+        if (!window.confirm("سيتم حذف الأعضاء والتقارير ومحاضر الاجتماعات نهائيًا. هل تريد المتابعة؟")) return;
+
+        try {
+          const result = await apiFetch("/api/system/reset", {
+            method: "POST",
+            body: JSON.stringify({ confirmation }),
+          });
+          document.getElementById("reset-confirmation").value = "";
+          await Promise.all([loadSystemMonitor(), loadDashboard(), loadMembers(), loadReports()]);
+          showToast(`تم التصفير: ${result.deleted.members} أعضاء، ${result.deleted.activities} تقارير، ${result.deleted.meetings} محاضر`);
         } catch (error) {
           showToast(error.message);
         }
