@@ -29,6 +29,8 @@ app.get("/app.css", (request, response) => {
   const polishStyles = fs.readFileSync(path.join(__dirname, "polish.css"), "utf8");
   response.type("css").send(`${baseStyles}\n${responsiveStyles}\n${polishStyles}`);
 });
+app.get("/index.html", (request, response) => response.redirect(302, "/login"));
+app.get("/legacy-forms", (request, response) => response.sendFile(path.join(__dirname, "index.html")));
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (request, response) => {
