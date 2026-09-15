@@ -25,7 +25,9 @@ app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 app.get("/app.css", (request, response) => {
   const baseStyles = fs.readFileSync(path.join(__dirname, "app.css"), "utf8");
-  response.type("css").send(`@import url("/responsive.css");\n${baseStyles}`);
+  const responsiveStyles = fs.readFileSync(path.join(__dirname, "responsive.css"), "utf8");
+  const polishStyles = fs.readFileSync(path.join(__dirname, "polish.css"), "utf8");
+  response.type("css").send(`${baseStyles}\n${responsiveStyles}\n${polishStyles}`);
 });
 app.use(express.static(path.join(__dirname)));
 
