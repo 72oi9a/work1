@@ -24,6 +24,24 @@ app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 app.use(express.static(path.join(__dirname)));
 
+app.get("/", (request, response) => {
+  response.sendFile(path.join(__dirname, "login.html"));
+});
+
+const pageRoutes = {
+  "/login": "login.html",
+  "/dashboard": "dashboard.html",
+  "/forms": "forms.html",
+  "/reports": "reports.html",
+  "/members": "members.html",
+  "/supervisors": "supervisors.html",
+  "/settings": "settings.html",
+};
+
+for (const [route, file] of Object.entries(pageRoutes)) {
+  app.get(route, (request, response) => response.sendFile(path.join(__dirname, file)));
+}
+
 app.get("/api/health", async (request, response) => {
   try {
     await pool.query("SELECT 1");
