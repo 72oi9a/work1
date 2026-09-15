@@ -1,13 +1,117 @@
-async function api(path, options = {}) { const response = await fetch(path, { credentials: "same-origin", headers: { "Content-Type": "application/json", ...(options.headers || {}) }, ...options }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || "حدث خطأ غير متوقع"); return data; }
-async function session() { try { const result = await api("/api/auth/me"); return result.user; } catch { window.location.href = "/login.html"; throw new Error("unauthenticated"); } }
-function shell(user, active) { document.querySelector(".user-name").textContent = user.full_name || user.username; document.querySelectorAll("[data-page]").forEach((link) => { link.classList.toggle("active", link.dataset.page === active); const key = link.dataset.page; if (user.role !== "قائد الفرقة" && !user.permissions?.[key]?.view) link.hidden = true; }); document.getElementById("logout").addEventListener("click", async () => { await api("/api/auth/logout", { method: "POST" }); window.location.href = "/login.html"; }); }
-function showError(error) { const target = document.querySelector("[data-error]"); if (target) { target.textContent = error.message; target.hidden = false; } }
-async function loadDashboard() { const result = await api("/api/dashboard"); document.querySelector("[data-members]").textContent = result.stats.members; document.querySelector("[data-reports]").textContent = result.stats.reports; document.querySelector("[data-patrols]").textContent = result.stats.patrols; document.querySelector("[data-attendance]").textContent = `${result.stats.attendance}%`; }
-async function loadReports() { const result = await api("/api/reports"); document.querySelector("[data-reports-count]").textContent = `${result.reports.length} تقرير`; document.querySelector("[data-report-rows]").innerHTML = result.reports.map((item) => `<tr><td>${item.type === "meeting" ? "محضر اجتماع" : "فعالية كشفية"}</td><td>${item.title || item.category || "-"}</td><td>${item.report_date || "-"}</td></tr>`).join("") || '<tr><td colspan="3">لا توجد تقارير</td></tr>'; }
-async function loadMembers() { const result = await api("/api/members"); document.querySelector("[data-member-count]").textContent = `${result.members.length} عضو`; document.querySelector("[data-member-rows]").innerHTML = result.members.map((item) => `<tr><td>${item.full_name}</td><td>${item.patrol || "-"}</td><td>${item.rank || "-"}</td></tr>`).join("") || '<tr><td colspan="3">لا توجد بيانات</td></tr>'; }
-async function loadMonitor() { const result = await api("/api/system/monitor"); document.querySelector("[data-db]").textContent = "متصلة"; document.querySelector("[data-monitor-members]").textContent = result.counts.members; document.querySelector("[data-monitor-activities]").textContent = result.counts.activities; document.querySelector("[data-monitor-meetings]").textContent = result.counts.meetings; }
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "حدث خطأ غير متوقع");
+  return data;
+}
+
+async function session() {
+  try {
+    const result = await api("/api/auth/me");
+    return result.user;
+  } catch {
+    window.location.href = "/login.html";
+    throw new Error("unauthenticated");
+  }
+}
+
+function shell(user, active) {
+  const name = user.full_name || user.username;
+  document.querySelectorAll(".user-name").forEach((element) => { element.textContent = name; });
+  document.querySelectorAll("[data-page]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.page === active);
+    const key = link.dataset.page;
+    if (user.role !== "قائد الفرقة" && !user.permissions?.[key]?.view) link.hidden = true;
+  });
+  document.getElementById("logout").addEventListener("click", async () => {
+    await api("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login.html";
+  });
+}
+
+function showError(error) {
+  const target = document.querySelector("[data-error]");
+  if (target) { target.textContent = error.message; target.hidden = false; }
+}
+
+async function loadDashboard() {
+  const result = await api("/api/dashboard");
+  document.querySelector("[data-members]").textContent = result.stats.members;
+  document.querySelector("[data-reports]").textContent = result.stats.reports;
+  document.querySelector("[data-patrols]").textContent = result.stats.patrols;
+  document.querySelector("[data-attendance]").textContent = `${result.stats.attendance}%`;
+}
+
+async function loadReports() {
+  const result = await api("/api/reports");
+  document.querySelector("[data-reports-count]").textContent = `${result.reports.length} تقرير`;
+  document.querySelector("[data-report-rows]").innerHTML = result.reports.map((item) => `<tr><td>${item.type === "meeting" ? "محضر اجتماع" : "فعالية كشفية"}</td><td>${item.title || item.category || "-"}</td><td>${item.report_date || "-"}</td></tr>`).join("") || '<tr><td colspan="3">لا توجد تقارير</td></tr>';
+}
+
+async function loadMembers() {
+  const result = await api("/api/members");
+  document.querySelector("[data-member-count]").textContent = `${result.members.length} عضو`;
+  document.querySelector("[data-member-rows]").innerHTML = result.members.map((item) => `<tr><td>${item.full_name}</td><td>${item.patrol || "-"}</td><td>${item.rank || "-"}</td></tr>`).join("") || '<tr><td colspan="3">لا توجد بيانات</td></tr>';
+}
+
+async function loadMonitor() {
+  const result = await api("/api/system/monitor");
+  document.querySelector("[data-db]").textContent = "متصلة";
+  document.querySelector("[data-monitor-members]").textContent = result.counts.members;
+  document.querySelector("[data-monitor-activities]").textContent = result.counts.activities;
+  document.querySelector("[data-monitor-meetings]").textContent = result.counts.meetings;
+}
+
 const pageLabels = { dashboard: "الرئيسية", "official-forms": "النماذج الرسمية", reports: "التقارير", members: "الأعضاء", supervisors: "المشرفون", settings: "الإعدادات" };
-async function loadUsers() { const result = await api("/api/users"); const rows = document.querySelector("[data-user-rows]"); rows.innerHTML = result.users.map((item) => `<tr><td>${item.full_name}<small class="muted">${item.username}</small></td><td>${item.role}</td><td class="status">${item.active ? "نشط" : "غير نشط"}</td><td><button class="button ghost" data-user-id="${item.id}" data-user-name="${item.full_name}">إدارة الصلاحيات</button></td></tr>`).join("") || '<tr><td colspan="4">لا يوجد مستخدمون</td></tr>'; rows.querySelectorAll("[data-user-id]").forEach((button) => button.addEventListener("click", () => selectUser(button.dataset.userId, button.dataset.userName))); }
-async function selectUser(userId, userName) { const result = await api(`/api/users/${userId}/permissions`); document.querySelector("[data-selected-user]").textContent = userName; document.querySelector("[data-permission-panel]").hidden = false; document.querySelector("[data-permission-panel]").dataset.userId = userId; document.querySelector("[data-permission-rows]").innerHTML = result.permissions.map((item) => `<tr data-permission-page="${item.page_key}"><td>${pageLabels[item.page_key] || item.page_key}</td>${["view", "create", "edit", "delete"].map((capability) => `<td><input type="checkbox" data-capability="${capability}" ${item[`can_${capability}`] ? "checked" : ""}></td>`).join("")}</tr>`).join(""); }
-async function savePermissions() { const panel = document.querySelector("[data-permission-panel]"); const permissions = [...panel.querySelectorAll("[data-permission-page]")].map((row) => ({ pageKey: row.dataset.permissionPage, ...Object.fromEntries([...row.querySelectorAll("[data-capability]")].map((input) => [input.dataset.capability, input.checked])) })); await api(`/api/users/${panel.dataset.userId}/permissions`, { method: "PUT", body: JSON.stringify({ permissions }) }); const status = document.querySelector("[data-permission-status]"); status.textContent = "تم حفظ الصلاحيات"; status.hidden = false; }
-(async () => { const user = await session(); const page = document.body.dataset.page; shell(user, page); try { if (page === "dashboard") await loadDashboard(); if (page === "reports") await loadReports(); if (page === "members") await loadMembers(); if (page === "supervisors") { await loadUsers(); document.querySelector("[data-save-permissions]").addEventListener("click", () => savePermissions().catch(showError)); } if (page === "settings") { await loadMonitor(); document.querySelector("[data-reset]").addEventListener("click", async () => { if (document.querySelector("[data-confirm]").value !== "تصفير") return showError(new Error("اكتب تصفير للتأكيد")); if (!confirm("سيتم حذف الأعضاء والتقارير والمحاضر نهائيًا")) return; await api("/api/system/reset", { method: "POST", body: JSON.stringify({ confirmation: "تصفير" }) }); await loadMonitor(); }); } } catch (error) { showError(error); } })();
+
+async function loadUsers() {
+  const result = await api("/api/users");
+  const rows = document.querySelector("[data-user-rows]");
+  rows.innerHTML = result.users.map((item) => `<tr><td>${item.full_name}<small class="muted">${item.username}</small></td><td>${item.role}</td><td class="status">${item.active ? "نشط" : "غير نشط"}</td><td><button class="button ghost" data-user-id="${item.id}" data-user-name="${item.full_name}">إدارة الصلاحيات</button></td></tr>`).join("") || '<tr><td colspan="4">لا يوجد مستخدمون</td></tr>';
+  rows.querySelectorAll("[data-user-id]").forEach((button) => button.addEventListener("click", () => selectUser(button.dataset.userId, button.dataset.userName)));
+}
+
+async function selectUser(userId, userName) {
+  const result = await api(`/api/users/${userId}/permissions`);
+  document.querySelector("[data-selected-user]").textContent = userName;
+  document.querySelector("[data-permission-panel]").hidden = false;
+  document.querySelector("[data-permission-panel]").dataset.userId = userId;
+  document.querySelector("[data-permission-rows]").innerHTML = result.permissions.map((item) => `<tr data-permission-page="${item.page_key}"><td>${pageLabels[item.page_key] || item.page_key}</td>${["view", "create", "edit", "delete"].map((capability) => `<td><input type="checkbox" data-capability="${capability}" ${item[`can_${capability}`] ? "checked" : ""}></td>`).join("")}</tr>`).join("");
+}
+
+async function savePermissions() {
+  const panel = document.querySelector("[data-permission-panel]");
+  const permissions = [...panel.querySelectorAll("[data-permission-page]")].map((row) => ({ pageKey: row.dataset.permissionPage, ...Object.fromEntries([...row.querySelectorAll("[data-capability]")].map((input) => [input.dataset.capability, input.checked])) }));
+  await api(`/api/users/${panel.dataset.userId}/permissions`, { method: "PUT", body: JSON.stringify({ permissions }) });
+  const status = document.querySelector("[data-permission-status]");
+  status.textContent = "تم حفظ الصلاحيات";
+  status.hidden = false;
+}
+
+(async () => {
+  const user = await session();
+  const page = document.body.dataset.page;
+  shell(user, page);
+  try {
+    if (page === "dashboard") await loadDashboard();
+    if (page === "reports") await loadReports();
+    if (page === "members") await loadMembers();
+    if (page === "supervisors") {
+      await loadUsers();
+      document.querySelector("[data-save-permissions]").addEventListener("click", () => savePermissions().catch(showError));
+    }
+    if (page === "settings") {
+      await loadMonitor();
+      document.querySelector("[data-reset]").addEventListener("click", async () => {
+        if (document.querySelector("[data-confirm]").value !== "تصفير") return showError(new Error("اكتب تصفير للتأكيد"));
+        if (!confirm("سيتم حذف الأعضاء والتقارير والمحاضر نهائيًا")) return;
+        await api("/api/system/reset", { method: "POST", body: JSON.stringify({ confirmation: "تصفير" }) });
+        await loadMonitor();
+      });
+    }
+  } catch (error) { showError(error); }
+})();

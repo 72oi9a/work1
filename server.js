@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const crypto = require("crypto");
 const { promisify } = require("util");
 const { Pool } = require("pg");
@@ -22,6 +23,10 @@ const SESSION_COOKIE = "scout_session";
 // Middlewares الأساسية
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
+app.get("/app.css", (request, response) => {
+  const baseStyles = fs.readFileSync(path.join(__dirname, "app.css"), "utf8");
+  response.type("css").send(`@import url("/responsive.css");\n${baseStyles}`);
+});
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (request, response) => {
