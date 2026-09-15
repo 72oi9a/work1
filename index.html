@@ -1401,6 +1401,7 @@
           width: 86%;
           margin: 0 auto 8mm;
           font-size: 10px;
+          direction: ltr;
         }
 
         .activity-print .template-print-table th,
@@ -1414,12 +1415,14 @@
           color: #fff;
           background: #a8a8a8;
           font-weight: 500;
+          direction: rtl;
         }
 
         .activity-print .template-print-table td {
           color: #111;
           background: #e1e1e1;
           text-align: center;
+          direction: rtl;
         }
 
         .activity-print .template-print-table .large-cell {
@@ -1427,6 +1430,30 @@
           color: #111;
           background: #e1e1e1;
           text-align: right;
+        }
+
+        .activity-program-table th,
+        .activity-program-table td {
+          vertical-align: middle;
+        }
+
+        .activity-program-table .program-description-cell {
+          min-height: 27mm;
+          vertical-align: top;
+          text-align: right;
+          white-space: pre-line;
+        }
+
+        .activity-program-table .program-time-cell {
+          min-width: 18mm;
+          font-size: 10px;
+        }
+
+        .activity-program-table .program-output-cell {
+          min-height: 27mm;
+          vertical-align: top;
+          text-align: right;
+          white-space: pre-line;
         }
 
         .activity-print .print-description {
@@ -2671,10 +2698,15 @@
               <tr><th>الأهداف الإجرائية</th><td colspan="3" class="large-cell">${value("act-objectives")}</td></tr>
             </table>
             <div class="print-section-title">ثالثاً: وصف البرنامج:</div>
-            <table class="template-print-table">
-              <tr><th>المخرج النهائي للبرنامج</th><td>${value("act-output")}</td><th>وقت التنفيذ</th><td>${formatTime(document.getElementById("act-from").value)} — ${formatTime(document.getElementById("act-to").value)}</td></tr>
+            <table class="template-print-table activity-program-table">
+              <tr><th colspan="2">وصف البرنامج</th><th colspan="2">وقت التنفيذ</th><th colspan="2">المخرج النهائي للبرنامج</th></tr>
+              <tr>
+                <td colspan="2" class="program-description-cell">${value("act-description")}</td>
+                <td class="program-time-cell">${formatTime(document.getElementById("act-from").value)}</td>
+                <td class="program-time-cell">${formatTime(document.getElementById("act-to").value)}</td>
+                <td colspan="2" class="program-output-cell">${value("act-output")}</td>
+              </tr>
             </table>
-            <div class="print-description">${value("act-description")}</div>
             <table class="template-print-table">
               <tr><th>نقاط القوة</th><td class="large-cell">${value("act-strengths")}</td><th>نقاط الضعف</th><td class="large-cell">${value("act-weaknesses")}</td></tr>
               <tr><th colspan="2">فرص التحسين والتطوير</th><td colspan="2" class="large-cell">${value("act-improvements")}</td></tr>
