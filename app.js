@@ -14,7 +14,7 @@ async function session() {
     const result = await api("/api/auth/me");
     return result.user;
   } catch {
-    window.location.href = "/login.html";
+    window.location.href = "/login";
     throw new Error("unauthenticated");
   }
 }
@@ -29,7 +29,7 @@ function shell(user, active) {
   });
   document.getElementById("logout").addEventListener("click", async () => {
     await api("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login.html";
+    window.location.href = "/login";
   });
 }
 

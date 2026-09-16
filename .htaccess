@@ -1,9 +1,16 @@
 RewriteEngine On
+DirectoryIndex index.php
 
-# Keep clean page URLs on PHP hosting.
-RewriteRule ^(login|dashboard|forms|reports|members|supervisors|settings)/?$ $1.html [L]
+# PHP is the production web entry point. These redirects keep old HTML bookmarks working.
+RewriteRule ^index\.html$ /login [R=302,L]
+RewriteRule ^(login|dashboard|forms|forms-generator|reports|members|supervisors|settings)\.html$ /$1 [R=302,L]
+RewriteRule ^(login|dashboard|forms|forms-generator|reports|members|supervisors|settings)/?$ index.php [QSA,L]
 RewriteRule ^legacy-forms/?$ /forms [R=301,L]
 RewriteRule ^api/(.*)$ index.php [QSA,L]
+
+<FilesMatch "^(config|auth|api|page)\.php$">
+  Require all denied
+</FilesMatch>
 
 <FilesMatch "\.(css|js|png|jpg|jpeg|gif|svg|webp|woff2?)$">
   Header set Cache-Control "public, max-age=86400"
